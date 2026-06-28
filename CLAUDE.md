@@ -30,7 +30,7 @@ GitHub Actions deploys automatically on push to `main`. The workflow (`.github/w
 
 **Settings modal** (gear icon): LLM provider (Anthropic/OpenAI/custom), model dropdown, API key (localStorage only).
 
-**Mobile nav**: On phones (≤600px) the top nav hides and a fixed bottom tab bar appears with icon + label for each tab. Desktop and iPad use the top nav unchanged.
+**Mobile nav**: On phones (≤600px) the top nav hides and a fixed bottom tab bar appears with inline SVG icon + label for each tab: graduation cap (Advisor), open book (Library), screen+play (Videos), wrench (Tools). Icons use `currentColor` so they inherit active/inactive states. Desktop and iPad use the top nav unchanged.
 
 ## Key data
 
