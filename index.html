@@ -686,9 +686,16 @@
   .lib-table tr:last-child td { border-bottom: none; }
   .lib-table tbody tr:hover td { background: var(--bg2); }
   .lib-table .col-name { font-weight: 600; white-space: nowrap; }
+  .lib-table .col-name .col-name-sub { font-size: 11.5px; font-weight: 400; color: var(--text3); display: none; margin-top: 2px; }
   .lib-table .col-title { color: var(--text2); }
   .lib-table .col-type { white-space: nowrap; }
   .lib-table .col-link { white-space: nowrap; text-align: right; }
+  @media (max-width: 640px) {
+    .lib-table .col-title, .lib-table th:nth-child(2) { display: none; }
+    .lib-table .col-type,  .lib-table th:nth-child(4) { display: none; }
+    .lib-table .col-name .col-name-sub { display: block; }
+    .lib-table td, .lib-table th { padding: 9px 10px; }
+  }
 
   /* ── Section headings ───────────────────────────────────── */
   .section-heading {
@@ -1306,9 +1313,9 @@ function renderLibrary() {
             const isFAA = r.type === 'faa';
             return `
               <tr id="card-${r.id}" data-type="${r.type}">
-                <td class="col-name">${r.shortName}</td>
+                <td class="col-name">${r.shortName}<span class="col-name-sub">${r.fullTitle}</span></td>
                 <td class="col-title">${r.fullTitle}</td>
-                <td><span class="card-tag ${isFAA ? '' : 'outline'}" style="font-size:10px">${r.tag}</span></td>
+                <td><span class="card-tag outline" style="font-size:10px">${r.tag}</span></td>
                 <td class="col-type"><span style="font-size:12px;color:var(--text3)">${isFAA ? 'FAA Official' : 'Book'}</span></td>
                 <td class="col-link">
                   <a class="card-btn blue" href="${r.url}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px;margin-top:0">
