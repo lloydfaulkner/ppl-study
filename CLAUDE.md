@@ -6,26 +6,11 @@ Single-file PPL ground school study organizer. Live at **https://lloydfaulkner.g
 
 One file: `index.html` — all CSS and JS inline, no build step, no framework. Google Fonts (Inter) is the only external dependency.
 
-Storage: localStorage only (saved videos, LLM settings, theme preference).
+Storage: localStorage only (saved videos, saved tools, LLM settings, theme preference).
 
 ## Deployment
 
-Two branches must stay in sync — always push to both:
-
-```bash
-git add index.html
-git commit -m "description"
-git push origin main
-cp index.html /tmp/ppl-index.html
-git checkout gh-pages
-cp /tmp/ppl-index.html index.html
-git add index.html
-git commit -m "description"
-git push origin gh-pages
-git checkout main
-```
-
-GitHub Pages serves from `gh-pages` branch at `/`.
+GitHub Actions deploys automatically on push to `main`. The workflow (`.github/workflows/pages.yml`) uploads the repo root and deploys to GitHub Pages. Do not manually sync a `gh-pages` branch — just push to `main`.
 
 ## Design
 
@@ -36,19 +21,24 @@ GitHub Pages serves from `gh-pages` branch at `/`.
 
 ## Structure
 
-**Three tabs** (Study Advisor is first/default):
+**Four tabs** (Study Advisor is first/default):
 
 1. **Study Advisor** — 18 topic chips → static chapter recommendations → clickable rows jump to Library card with pulse highlight. AI tips button if API key set.
 2. **Library** — 6 FAA docs + 6 books. Filter: All / FAA Official / Books. Card/list view toggle. Cards have "What it is" + "When to read it" only (no chapter breakdown — that lives in Study Advisor).
 3. **Videos** — 8 seeded YouTube videos + user-saved. Filter: All / My Saved / Weather / Radio / Landing. "+ Save a Video" modal saves to localStorage.
+4. **Tools** — 9 seeded study tools + user-saved. Filter: All / My Saved / Apps / Web Tools / Simulators / Posters. Card/list view toggle. "+ Add a Tool" modal saves to localStorage. Card titles are tappable links when a URL is present. Tools can have an optional `tip` field that renders italic/muted below the description.
 
 **Settings modal** (gear icon): LLM provider (Anthropic/OpenAI/custom), model dropdown, API key (localStorage only).
+
+**Mobile nav**: On phones (≤600px) the top nav hides and a fixed bottom tab bar appears with icon + label for each tab. Desktop and iPad use the top nav unchanged.
 
 ## Key data
 
 - `FAA_DOCS` — 6 resources: PHAK, AFH, AIM, FAR, ACS, Wx Handbook
 - `BOOKS` — 6 books: Stick & Rudder, Killing Zone, Rod Machado, Say Again, Fate Is Hunter, Weather Flying
 - `VIDEOS_SEED` — 8 seeded videos (IDs verified June 2026)
+- `TOOLS_SEED` — 9 seeded tools: Sporty's, Chairfly Dash, Chairfly Posters, King Schools, Gleim, ForeFlight, MSFS, Infinite Flight, SkyVector
+- `TOOL_TYPE_LABEL` — maps type keys (`app`, `web`, `sim`, `poster`) to display labels
 - `TOPICS` — 18 advisor topics including Aircraft Systems, Night Flying, Checkride Prep, etc.
 - `SOURCE_TO_CARD` — maps advisor source labels to library card IDs for jump-link behavior
 
@@ -60,4 +50,4 @@ Supports Anthropic (messages API) and OpenAI-compatible (chat completions API). 
 
 ## URL routing
 
-Hash-based: `#advisor`, `#library`, `#videos`. Default is `#advisor`.
+Hash-based: `#advisor`, `#library`, `#videos`, `#tools`. Default is `#advisor`.
