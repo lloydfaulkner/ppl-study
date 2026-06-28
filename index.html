@@ -1215,7 +1215,8 @@ const TOOLS_SEED = [
     name: 'Chairfly Posters',
     type: 'poster',
     tag: 'Visual Reference',
-    what: 'Printed posters illustrating traffic patterns, maneuvers, and flight procedures — designed for wall reference while chairflying. Tip: you can also photograph your actual cockpit and draw your own annotations — a personalized panel poster is even more useful than a generic one.',
+    what: 'Printed posters illustrating traffic patterns, maneuvers, and flight procedures — designed for wall reference while chairflying.',
+    tip: 'You can also photograph your actual cockpit and draw your own annotations — a personalized panel poster is even more useful than a generic one.',
     bestFor: 'Desk or wall reference during ground study. Great for visualizing pattern entries and maneuver geometry.',
     url: 'https://www.google.com/search?q=chairfly+posters',
     saved: false,
@@ -1739,6 +1740,7 @@ function renderTools() {
           ${titleEl}
           ${t.tag ? `<div class="card-subtitle">${escHtml(t.tag)}</div>` : ''}
           <div class="card-body"><strong>What it is:</strong> ${escHtml(t.what)}</div>
+          ${t.tip ? `<div class="card-body" style="font-style:italic;color:var(--text3)">💡 ${escHtml(t.tip)}</div>` : ''}
           <div class="card-body"><strong>Best for:</strong> ${escHtml(t.bestFor)}</div>
           ${deleteBtn ? `<div class="card-btn-row">${deleteBtn}</div>` : ''}
         </div>
