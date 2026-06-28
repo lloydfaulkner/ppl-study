@@ -645,43 +645,50 @@
   .view-btn:hover { border-color: var(--blue); color: var(--blue); }
   .view-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
 
-  /* List view overrides */
-  #library-grid.list-view {
-    grid-template-columns: 1fr;
-    gap: 6px;
+  /* Sortable table view */
+  .lib-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
   }
-  #library-grid.list-view .card {
-    flex-direction: row;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
+  .lib-table thead tr {
+    background: var(--bg2);
+    border-bottom: 2px solid var(--blue);
   }
-  #library-grid.list-view .card:hover { transform: none; }
-  #library-grid.list-view .card-left {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 120px;
-    flex-shrink: 0;
-  }
-  #library-grid.list-view .card-main {
-    flex: 1;
-    min-width: 0;
-  }
-  #library-grid.list-view .card-title { font-size: 14px; }
-  #library-grid.list-view .card-subtitle { font-size: 12px; }
-  #library-grid.list-view .card-body { display: none; }
-  #library-grid.list-view .card-btn {
-    flex-shrink: 0;
+  .lib-table th {
+    padding: 10px 14px;
+    text-align: left;
     font-size: 12px;
-    padding: 5px 10px;
-    margin-top: 0;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
   }
-  @media (max-width: 520px) {
-    #library-grid.list-view .card { flex-wrap: wrap; }
-    #library-grid.list-view .card-left { min-width: unset; flex-direction: row; align-items: center; }
+  .lib-table th:hover { color: var(--blue); }
+  .lib-table th.sort-active { color: var(--blue); }
+  .lib-table th .sort-icon { margin-left: 4px; opacity: 0.5; font-style: normal; }
+  .lib-table th.sort-active .sort-icon { opacity: 1; }
+  .lib-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
   }
+  .lib-table tr:last-child td { border-bottom: none; }
+  .lib-table tbody tr:hover td { background: var(--bg2); }
+  .lib-table .col-name { font-weight: 600; white-space: nowrap; }
+  .lib-table .col-title { color: var(--text2); }
+  .lib-table .col-type { white-space: nowrap; }
+  .lib-table .col-link { white-space: nowrap; text-align: right; }
 
   /* ── Section headings ───────────────────────────────────── */
   .section-heading {
@@ -1195,6 +1202,7 @@ const LLM_MODELS = {
 let currentTab = 'library';
 let libFilter = 'all';
 let libView = 'card'; // 'card' | 'list'
+let libSort = { col: 'name', dir: 1 }; // col: name|title|type|tag, dir: 1 asc / -1 desc
 let vidFilter = 'all';
 let activeTopicIdx = null;
 let savedVideos = [];
@@ -1251,34 +1259,71 @@ function navigateTo(tab) {
 // LIBRARY RENDER
 // ════════════════════════════════════════════════════════════
 
+function sortResources(list) {
+  const { col, dir } = libSort;
+  return [...list].sort((a, b) => {
+    let av, bv;
+    if (col === 'name')  { av = a.shortName; bv = b.shortName; }
+    if (col === 'title') { av = a.fullTitle;  bv = b.fullTitle; }
+    if (col === 'type')  { av = a.type;       bv = b.type; }
+    if (col === 'tag')   { av = a.tag;        bv = b.tag; }
+    return av < bv ? -dir : av > bv ? dir : 0;
+  });
+}
+
+function sortIcon(col) {
+  if (libSort.col !== col) return '<i class="sort-icon">↕</i>';
+  return `<i class="sort-icon">${libSort.dir === 1 ? '↑' : '↓'}</i>`;
+}
+
+function setSort(col) {
+  if (libSort.col === col) libSort.dir *= -1;
+  else libSort = { col, dir: 1 };
+  renderLibrary();
+}
+
 function renderLibrary() {
-  const grid = document.getElementById('library-grid');
+  const container = document.getElementById('library-grid');
   const all = [...FAA_DOCS, ...BOOKS];
   const filtered = libFilter === 'all' ? all : all.filter(r => r.type === libFilter);
 
-  grid.classList.toggle('list-view', libView === 'list');
-
   if (libView === 'list') {
-    grid.innerHTML = filtered.map(r => {
-      const isFAA = r.type === 'faa';
-      return `
-        <div class="card" id="card-${r.id}" data-type="${r.type}">
-          <div class="card-left">
-            <span class="card-tag ${isFAA ? '' : 'outline'}">${r.tag}</span>
-            <span class="card-code">${r.code}</span>
-          </div>
-          <div class="card-main">
-            <div class="card-title">${r.shortName}</div>
-            <div class="card-subtitle">${r.fullTitle}</div>
-          </div>
-          <a class="card-btn blue" href="${r.url}" target="_blank" rel="noopener">
-            ${isFAA ? '📄 PDF' : '🛒 Buy'} ↗
-          </a>
-        </div>
-      `;
-    }).join('');
+    container.style.display = 'block';
+    const sorted = sortResources(filtered);
+    container.innerHTML = `
+      <table class="lib-table" id="lib-table">
+        <thead>
+          <tr>
+            <th class="${libSort.col==='name'?'sort-active':''}" onclick="setSort('name')">Name ${sortIcon('name')}</th>
+            <th class="${libSort.col==='title'?'sort-active':''}" onclick="setSort('title')">Full Title ${sortIcon('title')}</th>
+            <th class="${libSort.col==='tag'?'sort-active':''}" onclick="setSort('tag')">Category ${sortIcon('tag')}</th>
+            <th class="${libSort.col==='type'?'sort-active':''}" onclick="setSort('type')">Type ${sortIcon('type')}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map(r => {
+            const isFAA = r.type === 'faa';
+            return `
+              <tr id="card-${r.id}" data-type="${r.type}">
+                <td class="col-name">${r.shortName}</td>
+                <td class="col-title">${r.fullTitle}</td>
+                <td><span class="card-tag ${isFAA ? '' : 'outline'}" style="font-size:10px">${r.tag}</span></td>
+                <td class="col-type"><span style="font-size:12px;color:var(--text3)">${isFAA ? 'FAA Official' : 'Book'}</span></td>
+                <td class="col-link">
+                  <a class="card-btn blue" href="${r.url}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px;margin-top:0">
+                    ${isFAA ? '📄 PDF' : '🛒 Buy'} ↗
+                  </a>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
   } else {
-    grid.innerHTML = filtered.map(r => {
+    container.style.display = '';
+    container.innerHTML = filtered.map(r => {
       const isFAA = r.type === 'faa';
       return `
         <div class="card" id="card-${r.id}" data-type="${r.type}">
