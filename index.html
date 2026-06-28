@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPL Ground School Study Organizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ── Base Reset & Variables ─────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #f0ead8;
+    --bg2:       #e8e0c8;
+    --bg3:       #ddd5bb;
+    --magenta:   #b8005a;
+    --magenta2:  #8c0044;
+    --blue:      #004fa8;
+    --blue2:     #003d82;
+    --text:      #1a1209;
+    --text2:     #4a3f2a;
+    --text3:     #7a6f5a;
+    --border:    rgba(0,0,0,0.12);
+    --card-bg:   rgba(255,253,245,0.85);
+    --shadow:    0 2px 8px rgba(0,0,0,0.12);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.18);
+    --radius:    8px;
+    --grid-color: rgba(0,79,168,0.07);
+  }
+
+  [data-theme="night"] {
+    --bg:        #1a1410;
+    --bg2:       #231e18;
+    --bg3:       #2d2720;
+    --text:      #f0ead8;
+    --text2:     #c8bea8;
+    --text3:     #8a8070;
+    --border:    rgba(255,255,255,0.1);
+    --card-bg:   rgba(35,30,24,0.95);
+    --shadow:    0 2px 8px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+    --grid-color: rgba(184,0,90,0.06);
+  }
+
+  /* ── Body & Grid Overlay ────────────────────────────────── */
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* ── Topbar ─────────────────────────────────────────────── */
+  #topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg2);
+    border-bottom: 2px solid var(--magenta);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px;
+    height: 54px;
+    box-shadow: var(--shadow);
+  }
+
+  #topbar .logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--magenta);
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+
+  #topbar .logo span {
+    color: var(--blue);
+  }
+
+  #nav {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-btn:hover { background: var(--bg3); color: var(--text); }
+  .nav-btn.active { background: var(--magenta); color: #fff; }
+
+  #topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .icon-btn:hover { background: var(--bg3); color: var(--text); }
+
+  /* ── Main Content ───────────────────────────────────────── */
+  #main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Filter Bar ─────────────────────────────────────────── */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+
+  .filter-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--magenta); color: var(--magenta); }
+  .filter-btn.active { background: var(--magenta); border-color: var(--magenta); color: #fff; }
+
+  /* ── Cards Grid ─────────────────────────────────────────── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+  .card-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--magenta);
+    color: #fff;
+    align-self: flex-start;
+  }
+  .card-tag.blue { background: var(--blue); }
+
+  .card-code {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: monospace;
+  }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .card-subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    font-style: italic;
+  }
+
+  .card-body {
+    font-size: 13.5px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .card-meta {
+    font-size: 12.5px;
+    color: var(--text3);
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+
+  .card-meta strong { color: var(--text2); }
+
+  .card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+    align-self: flex-start;
+  }
+
+  .card-btn.magenta { background: var(--magenta); color: #fff; }
+  .card-btn.magenta:hover { background: var(--magenta2); }
+  .card-btn.blue { background: var(--blue); color: #fff; }
+  .card-btn.blue:hover { background: var(--blue2); }
+  .card-btn.outline { background: none; border: 1px solid var(--border); color: var(--text2); }
+  .card-btn.outline:hover { border-color: var(--magenta); color: var(--magenta); background: none; }
+
+  /* Pulse highlight for library cards */
+  @keyframes pulse-highlight {
+    0%   { box-shadow: 0 0 0 0 rgba(184,0,90,0.5), var(--shadow); }
+    50%  { box-shadow: 0 0 0 8px rgba(184,0,90,0.15), var(--shadow-lg); }
+    100% { box-shadow: 0 0 0 0 rgba(184,0,90,0), var(--shadow); }
+  }
+  .card.pulse { animation: pulse-highlight 1.2s ease; }
+
+  /* ── Videos Tab ─────────────────────────────────────────── */
+  .videos-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .video-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .video-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+  .video-thumb-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: var(--bg3);
+    overflow: hidden;
+  }
+  .video-thumb-wrap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .video-play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.25);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .video-card:hover .video-play-overlay { opacity: 1; }
+  .video-play-overlay .play-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .video-info {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .video-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .video-channel {
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .video-notes {
+    font-size: 12.5px;
+    color: var(--text2);
+    font-style: italic;
+    margin-top: 2px;
+  }
+  .video-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .video-tag {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--bg3);
+    color: var(--text3);
+    font-weight: 500;
+  }
+  .video-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  /* ── Study Advisor Tab ──────────────────────────────────── */
+  .advisor-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 680px) {
+    .advisor-layout { grid-template-columns: 1fr; }
+  }
+
+  .topic-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: sticky;
+    top: 74px;
+  }
+  .topic-chip {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .topic-chip:hover { border-color: var(--magenta); color: var(--magenta); }
+  .topic-chip.active { background: var(--magenta); border-color: var(--magenta); color: #fff; }
+
+  .advisor-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .advisor-panel h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .advisor-panel .subtitle {
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 18px;
+  }
+
+  .rec-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .rec-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .rec-item:hover { border-color: var(--blue); background: var(--bg3); }
+
+  .rec-source {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
+    white-space: nowrap;
+    min-width: 50px;
+    padding-top: 1px;
+  }
+  .rec-detail {
+    flex: 1;
+  }
+  .rec-detail strong {
+    display: block;
+    font-size: 13.5px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .rec-detail span {
+    font-size: 12.5px;
+    color: var(--text2);
+  }
+
+  .advisor-ai {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+
+  .advisor-ai h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .ai-nudge {
+    font-size: 13px;
+    color: var(--text2);
+    background: var(--bg2);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    line-height: 1.6;
+  }
+
+  .ai-nudge a {
+    color: var(--magenta);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .ai-response {
+    font-size: 13.5px;
+    color: var(--text);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    white-space: pre-wrap;
+    line-height: 1.7;
+    margin-top: 10px;
+  }
+
+  /* ── Modal ──────────────────────────────────────────────── */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(3px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 520px;
+    padding: 28px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-close:hover { background: var(--bg3); }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--magenta);
+  }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+
+  .form-note {
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.5;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+  }
+  .btn-primary { background: var(--magenta); color: #fff; }
+  .btn-primary:hover { background: var(--magenta2); }
+  .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--bg2); }
+
+  /* ── Section headings ───────────────────────────────────── */
+  .section-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-size: 14px;
+    color: var(--text3);
+    margin-bottom: 22px;
+  }
+
+  /* ── Spinner ────────────────────────────────────────────── */
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--magenta);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Responsive ─────────────────────────────────────────── */
+  @media (max-width: 520px) {
+    .advisor-layout { grid-template-columns: 1fr; }
+    .topic-chips { flex-direction: row; flex-wrap: wrap; position: static; }
+    .topic-chip { padding: 5px 10px; font-size: 12px; }
+    #nav .nav-btn { padding: 6px 10px; font-size: 13px; }
+    #topbar .logo { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════ -->
+<header id="topbar">
+  <div class="logo">PPL<span>Study</span></div>
+  <nav id="nav">
+    <button class="nav-btn active" data-tab="library">Library</button>
+    <button class="nav-btn" data-tab="videos">Videos</button>
+    <button class="nav-btn" data-tab="advisor">Study Advisor</button>
+  </nav>
+  <div id="topbar-actions">
+    <button class="icon-btn" id="theme-toggle" title="Toggle day/night">☀️</button>
+    <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<main id="main">
+
+  <!-- ─── LIBRARY TAB ───────────────────────────────────── -->
+  <section id="tab-library" class="tab-panel active">
+    <h1 class="section-heading">Resource Library</h1>
+    <p class="section-sub">Essential FAA documents and recommended books for your PPL journey.</p>
+    <div class="filter-bar" id="lib-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="faa">FAA Official</button>
+      <button class="filter-btn" data-filter="book">Books</button>
+    </div>
+    <div class="cards-grid" id="library-grid"></div>
+  </section>
+
+  <!-- ─── VIDEOS TAB ────────────────────────────────────── -->
+  <section id="tab-videos" class="tab-panel">
+    <div class="videos-header">
+      <div>
+        <h1 class="section-heading">Video Resources</h1>
+        <p class="section-sub" style="margin-bottom:0">Curated YouTube content + your saved videos.</p>
+      </div>
+      <button class="btn btn-primary" id="save-video-btn">+ Save a Video</button>
+    </div>
+    <div class="filter-bar" id="vid-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="saved">My Saved</button>
+      <button class="filter-btn" data-filter="weather">Weather</button>
+      <button class="filter-btn" data-filter="radio">Radio</button>
+      <button class="filter-btn" data-filter="landing">Landing</button>
+    </div>
+    <div class="cards-grid" id="videos-grid"></div>
+  </section>
+
+  <!-- ─── ADVISOR TAB ───────────────────────────────────── -->
+  <section id="tab-advisor" class="tab-panel">
+    <h1 class="section-heading">Study Advisor</h1>
+    <p class="section-sub">Pick a topic to see targeted reading recommendations.</p>
+    <div class="advisor-layout">
+      <div class="topic-chips" id="topic-chips"></div>
+      <div class="advisor-panel" id="advisor-panel">
+        <p style="color:var(--text3); font-size:14px;">← Select a topic to see recommendations.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════════════════════════════════
+     SAVE VIDEO MODAL
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="save-video-modal">
+  <div class="modal">
+    <button class="modal-close" id="save-video-close">✕</button>
+    <h2>Save a Video</h2>
+    <div class="form-group">
+      <label>YouTube URL</label>
+      <input type="url" id="sv-url" placeholder="https://www.youtube.com/watch?v=...">
+    </div>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="sv-title" placeholder="Video title">
+    </div>
+    <div class="form-group">
+      <label>Channel</label>
+      <input type="text" id="sv-channel" placeholder="Channel name (optional)">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="sv-notes" placeholder="What's this video about, when to watch it..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags (comma-separated)</label>
+      <input type="text" id="sv-tags" placeholder="weather, landing, radio">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="save-video-cancel">Cancel</button>
+      <button class="btn btn-primary" id="save-video-save">Save Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SETTINGS MODAL
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="settings-modal">
+  <div class="modal">
+    <button class="modal-close" id="settings-close">✕</button>
+    <h2>Settings</h2>
+
+    <div class="form-group">
+      <label>LLM Provider</label>
+      <select id="llm-provider">
+        <option value="anthropic">Anthropic (Claude)</option>
+        <option value="openai">OpenAI (GPT)</option>
+        <option value="custom">Custom OpenAI-compatible endpoint</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Model</label>
+      <select id="llm-model"></select>
+    </div>
+
+    <div class="form-group" id="custom-endpoint-group" style="display:none">
+      <label>Custom Endpoint URL</label>
+      <input type="url" id="llm-endpoint" placeholder="https://your-endpoint.com/v1">
+    </div>
+
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="password" id="llm-apikey" placeholder="sk-...">
+    </div>
+
+    <p class="form-note">🔒 Your key is stored only in your browser. It is never sent anywhere except the provider you choose.</p>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="settings-cancel">Cancel</button>
+      <button class="btn btn-primary" id="settings-save">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════
+
+const FAA_DOCS = [
+  {
+    id: 'phak',
+    shortName: 'PHAK',
+    tag: 'Ground School Bible',
+    code: 'FAA-H-8083-25C',
+    fullTitle: "Pilot's Handbook of Aeronautical Knowledge",
+    what: 'The definitive FAA textbook covering every ground school topic from aerodynamics to airspace to weather. This is your primary study reference for the written exam.',
+    when: 'Start here, read early and often. Return to specific chapters as topics come up in training.',
+    chapters: 'Ch. 1 Intro · Ch. 4 Aerodynamics · Ch. 7 Aircraft Systems · Ch. 11–12 Weather · Ch. 14 Airspace · Ch. 15 Communication · Ch. 16 Navigation',
+    url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/phak',
+    type: 'faa'
+  },
+  {
+    id: 'afh',
+    shortName: 'AFH',
+    tag: 'How to Actually Fly',
+    code: 'FAA-H-8083-3C',
+    fullTitle: 'Airplane Flying Handbook',
+    what: 'The FAA manual on actual flight maneuvers — from taxiing to stalls to emergency landings. Pairs directly with your flight lessons.',
+    when: 'Read the chapter for whichever maneuver you\'re practicing that week.',
+    chapters: 'Ch. 3 Basic Maneuvers · Ch. 4 Stalls · Ch. 5 Takeoff/Landing · Ch. 9 Traffic Pattern · Ch. 17 Emergencies',
+    url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook',
+    type: 'faa'
+  },
+  {
+    id: 'aim',
+    shortName: 'AIM',
+    tag: 'How ATC Works',
+    code: 'AIM',
+    fullTitle: 'Aeronautical Information Manual',
+    what: 'The official guide to the U.S. National Airspace System — ATC procedures, radio communications, flight planning, and safety of flight information.',
+    when: 'Reference Chapter 4 early for radio calls; Chapter 7 for weather services before cross-countries.',
+    chapters: 'Ch. 2 Aeronautical Lighting · Ch. 3 Airspace · Ch. 4 ATC/Radio · Ch. 5 Procedures · Ch. 7 Safety of Flight',
+    url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/',
+    type: 'faa'
+  },
+  {
+    id: 'far',
+    shortName: 'FAR',
+    tag: 'The Rules',
+    code: '14 CFR',
+    fullTitle: 'Federal Aviation Regulations (14 CFR)',
+    what: 'The actual law governing aviation. Part 61 covers pilot certification; Part 91 covers operating rules for general aviation.',
+    when: 'Skim Part 61 and Part 91 for the written exam. Return to specific rules when questions arise.',
+    chapters: 'Part 61 Pilot Certification · Part 91 Operating Rules · Part 67 Medical · Part 43 Maintenance',
+    url: 'https://www.ecfr.gov/current/title-14',
+    type: 'faa'
+  },
+  {
+    id: 'acs',
+    shortName: 'ACS',
+    tag: 'Checkride Blueprint',
+    code: 'FAA-S-ACS-6C',
+    fullTitle: 'Private Pilot Airman Certification Standards',
+    what: 'The exact rubric your DPE uses on your checkride. Lists every task, required knowledge, and acceptable performance standard.',
+    when: 'Read cover-to-cover 2–3 months before your checkride. Use it to guide your final prep.',
+    chapters: 'Section I Pre-Flight · Section III Radio · Section V Takeoff/Landing · Section VII Stalls · Section IX Emergency',
+    url: 'https://www.faa.gov/training_testing/testing/acs',
+    type: 'faa'
+  },
+  {
+    id: 'wx',
+    shortName: 'Wx Handbook',
+    tag: 'Weather Theory',
+    code: 'FAA-H-8083-28',
+    fullTitle: 'Aviation Weather Handbook',
+    what: 'Comprehensive coverage of aviation meteorology — atmosphere structure, clouds, fronts, thunderstorms, icing, and weather products.',
+    when: 'Study Chapters 1–4 early for theory. Chapters 11–13 before starting cross-country flying.',
+    chapters: 'Ch. 1–4 Atmosphere & Clouds · Ch. 7 Precipitation · Ch. 10 Thunderstorms · Ch. 11–13 Weather Products',
+    url: 'https://www.faa.gov/regulationspolicies/handbooksmanuals/aviation/faa-h-8083-28-aviation-weather-handbook',
+    type: 'faa'
+  }
+];
+
+const BOOKS = [
+  {
+    id: 'stick-rudder',
+    shortName: 'Stick and Rudder',
+    tag: 'The Feel of Flying',
+    code: 'Wolfgang Langewiesche · 1944',
+    fullTitle: 'Stick and Rudder: An Explanation of the Art of Flying',
+    what: 'A classic that explains the physics of flight in plain English — angle of attack, lift, and control inputs in a way no FAA manual does. Genuinely changes how you think about flying.',
+    when: 'Read early to build an intuitive feel. Chapters 7–8 are essential before stall training.',
+    chapters: 'Ch. 1 The Pilot\'s Viewpoint · Ch. 7 Stalls · Ch. 8 Spins · Ch. 11 Landings',
+    url: 'https://www.amazon.com/dp/0070362408',
+    type: 'book'
+  },
+  {
+    id: 'killing-zone',
+    shortName: 'The Killing Zone',
+    tag: 'Safety & Judgment',
+    code: 'Paul A. Craig',
+    fullTitle: 'The Killing Zone: How & Why Pilots Die',
+    what: 'A data-driven look at the accidents that kill new pilots in their first 100–350 hours. Eye-opening and required reading for building airmanship.',
+    when: 'Read before your first solo cross-country. Then re-read before your checkride.',
+    chapters: 'Ch. 1 The Zone · Ch. 3 Decision Making · Ch. 5 Weather · Ch. 8 Avoiding the Zone',
+    url: 'https://www.amazon.com/dp/0071798781',
+    type: 'book'
+  },
+  {
+    id: 'rod-machado',
+    shortName: "Rod Machado's PPL Handbook",
+    tag: 'Best Written Exam Prep',
+    code: 'Rod Machado',
+    fullTitle: "Rod Machado's Private Pilot Handbook",
+    what: 'The most approachable and entertaining ground school book available. Covers the same material as the PHAK but with humor and memorable explanations.',
+    when: 'Great alternative or supplement to the PHAK. Excellent for written test prep.',
+    chapters: 'Full ground school coverage · Aerodynamics · Weather · Navigation · Regulations',
+    url: 'https://www.amazon.com/dp/0971201579',
+    type: 'book'
+  },
+  {
+    id: 'say-again',
+    shortName: 'Say Again, Please',
+    tag: 'Radio Calls',
+    code: 'Bob Gardner',
+    fullTitle: 'Say Again, Please: Guide to Radio Communications',
+    what: 'The definitive guide to aviation radio communications. Covers phraseology, ATC services, and realistic call examples from ground to tower to approach.',
+    when: 'Read before your first flight into controlled airspace. Keep as a reference throughout training.',
+    chapters: 'Full book covers radio calls · Ground · ATIS · Tower · Approach · Emergencies',
+    url: 'https://www.amazon.com/dp/1619549085',
+    type: 'book'
+  },
+  {
+    id: 'fate-hunter',
+    shortName: 'Fate Is the Hunter',
+    tag: 'Inspiration',
+    code: 'Ernest K. Gann · 1961',
+    fullTitle: 'Fate Is the Hunter',
+    what: 'A memoir of early airline flying that captures the romance, danger, and discipline of aviation better than anything else ever written. A reminder of why flying matters.',
+    when: 'Read whenever you need motivation or perspective. Perfect for a rest day.',
+    chapters: 'Memoir format · Pre-war · War years · Airline flying · Close calls',
+    url: 'https://www.amazon.com/dp/0671636030',
+    type: 'book'
+  },
+  {
+    id: 'weather-flying',
+    shortName: 'Weather Flying',
+    tag: 'Advanced Weather',
+    code: 'Robert N. Buck',
+    fullTitle: 'Weather Flying',
+    what: 'The practical pilot\'s guide to understanding and flying in real-world weather, written by an airline captain with decades of experience. Goes far beyond the FAA theory.',
+    when: 'Read after you understand weather basics. Excellent preparation for instrument and advanced flying.',
+    chapters: 'Whole book · Thunderstorms · Icing · Go/No-Go · Decision Making',
+    url: 'https://www.amazon.com/dp/0070088802',
+    type: 'book'
+  }
+];
+
+const VIDEOS_SEED = [
+  { id: 'v-1', title: 'Private Pilot Ground School (Full Course)', channel: 'Pilot Institute', videoId: 'hSmMNBsnzMg', tags: [], saved: false },
+  { id: 'v-2', title: 'How to Land an Airplane (Complete Guide)', channel: 'MzeroA Flight Training', videoId: '0Fvhm7xD9EE', tags: ['landing'], saved: false },
+  { id: 'v-3', title: 'My First Solo Flight', channel: 'FlightChops', videoId: 'NmR5z0dYBao', tags: [], saved: false },
+  { id: 'v-4', title: 'ATC Communications for Student Pilots', channel: "Sporty's Pilot Shop", videoId: 'KE5GQOPQ1s4', tags: ['radio'], saved: false },
+  { id: 'v-5', title: 'Traffic Pattern Entry Explained', channel: 'Fly8MA', videoId: 'u_ZwWNVnzx0', tags: ['landing'], saved: false },
+  { id: 'v-6', title: 'Understanding the Stall: Angle of Attack', channel: 'Pilot Institute', videoId: 'nmMFVWfJVFE', tags: [], saved: false },
+  { id: 'v-7', title: 'How to Read METARs and TAFs', channel: 'MzeroA Flight Training', videoId: '1iC8UtqWNuU', tags: ['weather'], saved: false },
+  { id: 'v-8', title: 'Private Pilot Written Test Prep', channel: 'King Schools', videoId: 'FE2OatZY8wY', tags: [], saved: false },
+];
+
+const TOPICS = [
+  {
+    name: 'Traffic Pattern & Landing',
+    recs: [
+      { source: 'AFH', detail: 'Chapter 5 & 9', note: 'Traffic pattern procedures, approach, flare, touchdown' },
+      { source: 'PHAK', detail: 'Chapter 14', note: 'Airspace and traffic pattern altitudes' },
+      { source: 'AIM', detail: 'Chapter 4', note: 'ATC communication in the pattern' },
+      { source: 'ACS', detail: 'Section V', note: 'Checkride performance standards for takeoff & landing' },
+    ]
+  },
+  {
+    name: 'Stalls & Slow Flight',
+    recs: [
+      { source: 'AFH', detail: 'Chapter 4', note: 'Stall recognition, recovery, and slow flight' },
+      { source: 'Stick & Rudder', detail: 'Ch. 7 & 8', note: 'Intuitive explanation of stalls and spins' },
+      { source: 'PHAK', detail: 'Chapter 4', note: 'Aerodynamic theory of stalls, angle of attack' },
+      { source: 'ACS', detail: 'Section VII', note: 'Checkride standards for stalls' },
+    ]
+  },
+  {
+    name: 'Radio Communications',
+    recs: [
+      { source: 'AIM', detail: 'Chapter 4', note: 'Phraseology, ATC services, readbacks' },
+      { source: 'Say Again', detail: 'Whole book', note: 'The definitive radio communications guide' },
+      { source: 'PHAK', detail: 'Chapter 15', note: 'Communication systems and procedures' },
+      { source: 'ACS', detail: 'Section III', note: 'Radio communication checkride requirements' },
+    ]
+  },
+  {
+    name: 'Weather & Go/No-Go',
+    recs: [
+      { source: 'PHAK', detail: 'Ch. 11–12', note: 'Weather theory, clouds, fronts, hazards' },
+      { source: 'Wx Handbook', detail: 'Ch. 1–4, 10–13', note: 'Comprehensive meteorology and weather products' },
+      { source: 'AIM', detail: 'Chapter 7', note: 'Safety of flight, weather services, PIREPs' },
+      { source: 'Weather Flying', detail: 'Whole book', note: 'Practical go/no-go decision making' },
+    ]
+  },
+  {
+    name: 'Navigation & Cross-Country',
+    recs: [
+      { source: 'PHAK', detail: 'Ch. 16', note: 'Navigation, sectional charts, pilotage, dead reckoning' },
+      { source: 'AFH', detail: 'Chapter 16', note: 'Cross-country flight planning and execution' },
+      { source: 'AIM', detail: 'Ch. 5', note: 'Procedures for cross-country, ADIZ, VFR flight plans' },
+      { source: 'ACS', detail: 'Section IX', note: 'Navigation checkride standards' },
+    ]
+  },
+  {
+    name: 'Airspace',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 14', note: 'All airspace classes, dimensions, requirements' },
+      { source: 'AIM', detail: 'Chapter 3', note: 'Detailed airspace descriptions and procedures' },
+      { source: 'FAR', detail: 'Part 91.117–91.135', note: 'Airspace operating rules, speed limits' },
+      { source: 'ACS', detail: 'Section II', note: 'Airspace knowledge checkride requirements' },
+    ]
+  },
+  {
+    name: 'Regulations (FAR)',
+    recs: [
+      { source: 'FAR', detail: 'Part 61', note: 'Pilot certification requirements and privileges' },
+      { source: 'FAR', detail: 'Part 91', note: 'General operating and flight rules' },
+      { source: 'PHAK', detail: 'Chapter 1', note: 'Overview of the regulatory framework' },
+      { source: 'ACS', detail: 'Section I', note: 'Regulations tested on the checkride' },
+    ]
+  },
+  {
+    name: 'Emergency Procedures',
+    recs: [
+      { source: 'AFH', detail: 'Chapter 17', note: 'Engine failures, emergency landings, fires' },
+      { source: 'PHAK', detail: 'Ch. 7 & 17', note: 'Aircraft systems and emergencies' },
+      { source: 'ACS', detail: 'Section IX', note: 'Emergency procedure checkride standards' },
+      { source: 'Killing Zone', detail: 'Ch. 3', note: 'Decision making in degraded situations' },
+    ]
+  },
+  {
+    name: 'Weight & Balance',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 9', note: 'Weight and balance theory, CG calculations' },
+      { source: 'AFH', detail: 'Chapter 2', note: 'Pre-flight planning including W&B' },
+      { source: 'FAR', detail: 'Part 91.9', note: 'Operating limitations, max gross weight' },
+      { source: 'ACS', detail: 'Section I', note: 'W&B checkride knowledge requirements' },
+    ]
+  },
+  {
+    name: 'Aircraft Performance',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 10', note: 'Performance charts, density altitude, POH usage' },
+      { source: 'AFH', detail: 'Chapter 2', note: 'Using the Pilot Operating Handbook' },
+      { source: 'PHAK', detail: 'Chapter 4', note: 'How aerodynamics affect performance' },
+      { source: 'ACS', detail: 'Section I', note: 'Performance planning checkride requirements' },
+    ]
+  },
+  {
+    name: 'Flight Instruments',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 8', note: 'Pitot-static, gyroscopic, and magnetic instruments' },
+      { source: 'AFH', detail: 'Chapter 3', note: 'Instrument scan during basic maneuvers' },
+      { source: 'PHAK', detail: 'Chapter 7', note: 'Aircraft systems including avionics' },
+      { source: 'ACS', detail: 'Section II', note: 'Instrument knowledge for the checkride' },
+    ]
+  },
+  {
+    name: 'Aerodynamics',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 4', note: 'Lift, drag, thrust, four forces of flight' },
+      { source: 'Stick & Rudder', detail: 'Ch. 1–6', note: 'Intuitive explanation every pilot should read' },
+      { source: 'AFH', detail: 'Chapter 3', note: 'How aerodynamics apply to maneuvers' },
+      { source: 'ACS', detail: 'Section II', note: 'Aerodynamics knowledge tested on checkride' },
+    ]
+  },
+  {
+    name: 'Checkride Prep',
+    recs: [
+      { source: 'ACS', detail: 'Whole document', note: 'Read cover-to-cover — this IS the checkride rubric' },
+      { source: 'AFH', detail: 'Review all', note: 'Maneuver standards directly from ACS' },
+      { source: 'FAR', detail: 'Parts 61 & 91', note: 'Regulations commonly tested on oral' },
+      { source: 'Rod Machado', detail: 'Full book', note: 'Best written test prep available' },
+    ]
+  },
+  {
+    name: 'Night Flying',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 17', note: 'Night vision physiology, lighting, illusions' },
+      { source: 'AFH', detail: 'Chapter 10', note: 'Night flight procedures and techniques' },
+      { source: 'FAR', detail: 'Part 91.209', note: 'Aircraft lighting requirements for night' },
+      { source: 'AIM', detail: 'Chapter 2', note: 'Aeronautical lighting and airport beacons' },
+    ]
+  },
+];
+
+// Resource ID → library card ID mapping for advisor links
+const SOURCE_TO_CARD = {
+  'PHAK': 'phak', 'AFH': 'afh', 'AIM': 'aim', 'FAR': 'far', 'ACS': 'acs',
+  'Wx Handbook': 'wx', 'Stick & Rudder': 'stick-rudder', 'Killing Zone': 'killing-zone',
+  'Rod Machado': 'rod-machado', 'Say Again': 'say-again', 'Fate Is Hunter': 'fate-hunter',
+  'Weather Flying': 'weather-flying',
+};
+
+// LLM model lists
+const LLM_MODELS = {
+  anthropic: ['claude-opus-4-8', 'claude-sonnet-4-6', 'claude-haiku-4-5-20251001'],
+  openai:    ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo'],
+  custom:    ['custom-model'],
+};
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+
+let currentTab = 'library';
+let libFilter = 'all';
+let vidFilter = 'all';
+let activeTopicIdx = null;
+let savedVideos = [];
+let llmSettings = { provider: 'anthropic', model: 'claude-sonnet-4-6', apiKey: '', endpoint: '' };
+let nightMode = false;
+
+function loadState() {
+  const sv = localStorage.getItem('ppl_saved_videos');
+  if (sv) savedVideos = JSON.parse(sv);
+
+  const ls = localStorage.getItem('ppl_llm_settings');
+  if (ls) llmSettings = { ...llmSettings, ...JSON.parse(ls) };
+
+  const theme = localStorage.getItem('ppl_theme');
+  if (theme) {
+    nightMode = theme === 'night';
+  } else {
+    nightMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  applyTheme();
+}
+
+function saveVideosToStorage() {
+  localStorage.setItem('ppl_saved_videos', JSON.stringify(savedVideos));
+}
+
+function saveLLMSettings() {
+  localStorage.setItem('ppl_llm_settings', JSON.stringify(llmSettings));
+}
+
+// ════════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════════
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', nightMode ? 'night' : 'day');
+  document.getElementById('theme-toggle').textContent = nightMode ? '🌙' : '☀️';
+}
+
+// ════════════════════════════════════════════════════════════
+// ROUTING
+// ════════════════════════════════════════════════════════════
+
+function navigateTo(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add('active');
+  history.replaceState(null, '', '#' + tab);
+}
+
+// ════════════════════════════════════════════════════════════
+// LIBRARY RENDER
+// ════════════════════════════════════════════════════════════
+
+function renderLibrary() {
+  const grid = document.getElementById('library-grid');
+  const all = [...FAA_DOCS, ...BOOKS];
+  const filtered = libFilter === 'all' ? all : all.filter(r => r.type === libFilter);
+
+  grid.innerHTML = filtered.map(r => {
+    const isFAA = r.type === 'faa';
+    return `
+      <div class="card" id="card-${r.id}" data-type="${r.type}">
+        <div>
+          <span class="card-tag ${isFAA ? '' : 'blue'}">${r.tag}</span>
+          <span class="card-code" style="margin-left:8px">${r.code}</span>
+        </div>
+        <div class="card-title">${r.shortName}</div>
+        <div class="card-subtitle">${r.fullTitle}</div>
+        <div class="card-body"><strong>What it is:</strong> ${r.what}</div>
+        <div class="card-body"><strong>When to read it:</strong> ${r.when}</div>
+        <div class="card-meta"><strong>Chapters:</strong> ${r.chapters}</div>
+        <a class="card-btn ${isFAA ? 'magenta' : 'blue'}" href="${r.url}" target="_blank" rel="noopener">
+          ${isFAA ? '📄 Free PDF' : '🛒 Amazon'} ↗
+        </a>
+      </div>
+    `;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// VIDEO RENDER
+// ════════════════════════════════════════════════════════════
+
+function extractVideoId(url) {
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}
+
+function renderVideos() {
+  const grid = document.getElementById('videos-grid');
+  const allVideos = [
+    ...VIDEOS_SEED,
+    ...savedVideos.map(v => ({ ...v, saved: true }))
+  ];
+
+  const filtered = allVideos.filter(v => {
+    if (vidFilter === 'all') return true;
+    if (vidFilter === 'saved') return v.saved;
+    return (v.tags || []).includes(vidFilter);
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<p style="color:var(--text3); font-size:14px; grid-column:1/-1;">No videos match this filter.</p>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(v => {
+    const thumb = `https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg`;
+    const ytUrl = `https://www.youtube.com/watch?v=${v.videoId}`;
+    const tagHtml = (v.tags || []).map(t => `<span class="video-tag">${t}</span>`).join('');
+    const savedBadge = v.saved ? '<span class="video-tag" style="background:var(--magenta);color:#fff">Saved</span>' : '';
+    const deleteBtn = v.saved
+      ? `<button class="card-btn outline" onclick="deleteVideo('${v.id}')" style="font-size:12px;padding:5px 10px">🗑 Remove</button>`
+      : '';
+    return `
+      <div class="video-card">
+        <a href="${ytUrl}" target="_blank" rel="noopener">
+          <div class="video-thumb-wrap">
+            <img src="${thumb}" alt="${v.title}" loading="lazy">
+            <div class="video-play-overlay"><div class="play-icon">▶</div></div>
+          </div>
+        </a>
+        <div class="video-info">
+          <div class="video-title">${v.title}</div>
+          <div class="video-channel">${v.channel || ''}</div>
+          ${v.notes ? `<div class="video-notes">${v.notes}</div>` : ''}
+          <div class="video-tags">${savedBadge}${tagHtml}</div>
+          <div class="video-actions">
+            <a class="card-btn magenta" href="${ytUrl}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px">▶ Watch</a>
+            ${deleteBtn}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteVideo(id) {
+  savedVideos = savedVideos.filter(v => v.id !== id);
+  saveVideosToStorage();
+  renderVideos();
+}
+
+// ════════════════════════════════════════════════════════════
+// ADVISOR RENDER
+// ════════════════════════════════════════════════════════════
+
+function renderTopicChips() {
+  const container = document.getElementById('topic-chips');
+  container.innerHTML = TOPICS.map((t, i) =>
+    `<button class="topic-chip ${activeTopicIdx === i ? 'active' : ''}" onclick="selectTopic(${i})">${t.name}</button>`
+  ).join('');
+}
+
+function selectTopic(idx) {
+  activeTopicIdx = idx;
+  renderTopicChips();
+  renderAdvisorPanel();
+}
+
+function renderAdvisorPanel() {
+  const panel = document.getElementById('advisor-panel');
+  if (activeTopicIdx === null) {
+    panel.innerHTML = `<p style="color:var(--text3); font-size:14px;">← Select a topic to see recommendations.</p>`;
+    return;
+  }
+  const topic = TOPICS[activeTopicIdx];
+  const hasKey = !!llmSettings.apiKey;
+
+  const recHtml = topic.recs.map(r => {
+    const cardId = SOURCE_TO_CARD[r.source];
+    return `
+      <div class="rec-item" onclick="jumpToCard('${cardId}')" title="Jump to ${r.source} in Library">
+        <div class="rec-source">${r.source}</div>
+        <div class="rec-detail">
+          <strong>${r.detail}</strong>
+          <span>${r.note}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-left:4px">→</div>
+      </div>
+    `;
+  }).join('');
+
+  const aiSection = hasKey
+    ? `
+      <div class="advisor-ai">
+        <h3>AI Personalized Tips</h3>
+        <button class="btn btn-primary" id="ask-ai-btn" onclick="askAI('${topic.name}')">
+          Ask AI for tips on: ${topic.name}
+        </button>
+        <div id="ai-response-area"></div>
+      </div>
+    `
+    : `
+      <div class="advisor-ai">
+        <h3>AI Personalized Tips</h3>
+        <div class="ai-nudge">
+          No API key set. <a onclick="document.getElementById('settings-modal').classList.add('open')">Open Settings</a>
+          to add your Anthropic or OpenAI key and get personalized study tips powered by AI.
+        </div>
+      </div>
+    `;
+
+  panel.innerHTML = `
+    <h2>${topic.name}</h2>
+    <p class="subtitle">Click any recommendation to jump to that resource in the Library.</p>
+    <div class="rec-list">${recHtml}</div>
+    ${aiSection}
+  `;
+}
+
+function jumpToCard(cardId) {
+  if (!cardId) return;
+  navigateTo('library');
+  setTimeout(() => {
+    const el = document.getElementById('card-' + cardId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('pulse');
+    void el.offsetWidth;
+    el.classList.add('pulse');
+    setTimeout(() => el.classList.remove('pulse'), 1300);
+  }, 80);
+}
+
+// ════════════════════════════════════════════════════════════
+// AI ADVISOR
+// ════════════════════════════════════════════════════════════
+
+async function askAI(topicName) {
+  const btn = document.getElementById('ask-ai-btn');
+  const area = document.getElementById('ai-response-area');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span>Asking AI…`;
+  area.innerHTML = '';
+
+  const systemPrompt = `You are a helpful flight instructor assistant. The student is a private pilot student with approximately 4-5 hours of flight time, training in a Cessna 172 at KUZA (Rock Hill, SC).`;
+  const userPrompt = `Give me a focused study guide for the topic: "${topicName}".
+
+Please include:
+1. The 2-3 key concepts most important at my stage (4-5 hours)
+2. Specific sections to read (with chapter/page references where possible)
+3. One common student mistake to avoid on this topic
+4. One self-check question I can answer to test my understanding
+
+Keep it concise and practical.`;
+
+  try {
+    let result = '';
+    const { provider, model, apiKey, endpoint } = llmSettings;
+
+    if (provider === 'anthropic') {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-calls': 'true',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 800,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        }),
+      });
+      if (!res.ok) throw new Error(`Anthropic API error: ${res.status}`);
+      const data = await res.json();
+      result = data.content?.[0]?.text || 'No response.';
+
+    } else {
+      const baseUrl = provider === 'custom' ? endpoint : 'https://api.openai.com/v1';
+      const res = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 800,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+        }),
+      });
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      const data = await res.json();
+      result = data.choices?.[0]?.message?.content || 'No response.';
+    }
+
+    area.innerHTML = `<div class="ai-response">${escHtml(result)}</div>`;
+  } catch (e) {
+    area.innerHTML = `<div class="ai-response" style="color:var(--magenta)">Error: ${escHtml(e.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `Ask AI for tips on: ${topicName}`;
+  }
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ════════════════════════════════════════════════════════════
+// SETTINGS MODAL
+// ════════════════════════════════════════════════════════════
+
+function openSettings() {
+  const modal = document.getElementById('settings-modal');
+  const prov = document.getElementById('llm-provider');
+  const modelSel = document.getElementById('llm-model');
+  const keyInp = document.getElementById('llm-apikey');
+  const endpointGrp = document.getElementById('custom-endpoint-group');
+  const endpointInp = document.getElementById('llm-endpoint');
+
+  prov.value = llmSettings.provider;
+  keyInp.value = llmSettings.apiKey;
+  endpointInp.value = llmSettings.endpoint || '';
+  updateModelOptions(llmSettings.provider, llmSettings.model);
+  endpointGrp.style.display = llmSettings.provider === 'custom' ? 'flex' : 'none';
+
+  prov.onchange = () => {
+    updateModelOptions(prov.value);
+    endpointGrp.style.display = prov.value === 'custom' ? 'flex' : 'none';
+  };
+
+  modal.classList.add('open');
+}
+
+function updateModelOptions(provider, currentModel) {
+  const sel = document.getElementById('llm-model');
+  const models = LLM_MODELS[provider] || [];
+  sel.innerHTML = models.map(m =>
+    `<option value="${m}" ${m === currentModel ? 'selected' : ''}>${m}</option>`
+  ).join('');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('open');
+}
+
+function saveSettings() {
+  llmSettings.provider = document.getElementById('llm-provider').value;
+  llmSettings.model = document.getElementById('llm-model').value;
+  llmSettings.apiKey = document.getElementById('llm-apikey').value.trim();
+  llmSettings.endpoint = document.getElementById('llm-endpoint').value.trim();
+  saveLLMSettings();
+  closeSettings();
+  if (activeTopicIdx !== null) renderAdvisorPanel();
+}
+
+// ════════════════════════════════════════════════════════════
+// SAVE VIDEO MODAL
+// ════════════════════════════════════════════════════════════
+
+function openSaveVideoModal() {
+  document.getElementById('sv-url').value = '';
+  document.getElementById('sv-title').value = '';
+  document.getElementById('sv-channel').value = '';
+  document.getElementById('sv-notes').value = '';
+  document.getElementById('sv-tags').value = '';
+  document.getElementById('save-video-modal').classList.add('open');
+}
+
+function closeSaveVideoModal() {
+  document.getElementById('save-video-modal').classList.remove('open');
+}
+
+function saveVideo() {
+  const url = document.getElementById('sv-url').value.trim();
+  const title = document.getElementById('sv-title').value.trim();
+  const channel = document.getElementById('sv-channel').value.trim();
+  const notes = document.getElementById('sv-notes').value.trim();
+  const tagsRaw = document.getElementById('sv-tags').value.trim();
+
+  if (!url || !title) {
+    alert('Please enter at least a YouTube URL and title.');
+    return;
+  }
+
+  const videoId = extractVideoId(url);
+  if (!videoId) {
+    alert('Could not extract video ID from URL. Please use a standard YouTube URL.');
+    return;
+  }
+
+  const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+  const vid = {
+    id: 'u-' + Date.now(),
+    title, channel, videoId, notes, tags, saved: true,
+  };
+
+  savedVideos.push(vid);
+  saveVideosToStorage();
+  closeSaveVideoModal();
+  renderVideos();
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+
+function init() {
+  loadState();
+
+  // Hash routing
+  const hash = location.hash.replace('#', '');
+  if (['library', 'videos', 'advisor'].includes(hash)) {
+    navigateTo(hash);
+  } else {
+    navigateTo('library');
+  }
+
+  // Nav
+  document.getElementById('nav').addEventListener('click', e => {
+    const btn = e.target.closest('.nav-btn');
+    if (btn) navigateTo(btn.dataset.tab);
+  });
+
+  // Theme toggle
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    nightMode = !nightMode;
+    localStorage.setItem('ppl_theme', nightMode ? 'night' : 'day');
+    applyTheme();
+  });
+
+  // Settings
+  document.getElementById('settings-btn').addEventListener('click', openSettings);
+  document.getElementById('settings-close').addEventListener('click', closeSettings);
+  document.getElementById('settings-cancel').addEventListener('click', closeSettings);
+  document.getElementById('settings-save').addEventListener('click', saveSettings);
+
+  // Save video
+  document.getElementById('save-video-btn').addEventListener('click', openSaveVideoModal);
+  document.getElementById('save-video-close').addEventListener('click', closeSaveVideoModal);
+  document.getElementById('save-video-cancel').addEventListener('click', closeSaveVideoModal);
+  document.getElementById('save-video-save').addEventListener('click', saveVideo);
+
+  // Close modals on backdrop click
+  document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+    backdrop.addEventListener('click', e => {
+      if (e.target === backdrop) backdrop.classList.remove('open');
+    });
+  });
+
+  // Library filters
+  document.getElementById('lib-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    libFilter = btn.dataset.filter;
+    document.querySelectorAll('#lib-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLibrary();
+  });
+
+  // Video filters
+  document.getElementById('vid-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    vidFilter = btn.dataset.filter;
+    document.querySelectorAll('#vid-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderVideos();
+  });
+
+  // Initial renders
+  renderLibrary();
+  renderVideos();
+  renderTopicChips();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
