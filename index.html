@@ -906,6 +906,48 @@
     font-size: 12px;
   }
 
+  .welcome-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .welcome-tab-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .welcome-tab-card:hover { border-color: var(--blue); background: var(--bg3); }
+
+  .welcome-tab-icon { font-size: 16px; line-height: 1; }
+
+  .welcome-tab-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+
+  .welcome-tab-desc {
+    font-size: 11.5px;
+    color: var(--text3);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .welcome-tabs { grid-template-columns: repeat(2, 1fr); }
+  }
+
   @media (max-width: 520px) {
     .welcome-icon { display: none; }
     #welcome-banner { padding: 16px; }
@@ -952,6 +994,28 @@
         <li><strong>Offline-First &amp; Local</strong> — Keep track of your study materials cleanly so you can reference your desktop setup anywhere.</li>
         <li><strong>AI Ground Instructor</strong> — Plug in your own API key via the settings <span aria-label="gear icon">⚙️</span> to turn the <strong>Study Advisor</strong> into an on-demand CFII that instantly maps your training roadblocks to the exact chapters in the FAA Handbooks.</li>
       </ul>
+      <div class="welcome-tabs" role="list">
+        <button class="welcome-tab-card" data-tab="advisor" role="listitem">
+          <span class="welcome-tab-icon" aria-hidden="true">🎓</span>
+          <span class="welcome-tab-name">Study Advisor</span>
+          <span class="welcome-tab-desc">Pick a topic and get chapter-level reading recommendations from the FAA handbooks.</span>
+        </button>
+        <button class="welcome-tab-card" data-tab="library" role="listitem">
+          <span class="welcome-tab-icon" aria-hidden="true">📚</span>
+          <span class="welcome-tab-name">Library</span>
+          <span class="welcome-tab-desc">Browse the 6 essential FAA documents and 6 recommended books for your PPL.</span>
+        </button>
+        <button class="welcome-tab-card" data-tab="videos" role="listitem">
+          <span class="welcome-tab-icon" aria-hidden="true">▶️</span>
+          <span class="welcome-tab-name">Videos</span>
+          <span class="welcome-tab-desc">Curated YouTube videos plus your own saved links, filtered by topic.</span>
+        </button>
+        <button class="welcome-tab-card" data-tab="tools" role="listitem">
+          <span class="welcome-tab-icon" aria-hidden="true">🔧</span>
+          <span class="welcome-tab-name">Tools</span>
+          <span class="welcome-tab-desc">Apps, simulators, web tools, and cockpit posters — seed list plus your own additions.</span>
+        </button>
+      </div>
     </div>
     <button class="icon-btn" id="welcome-close" title="Dismiss" aria-label="Dismiss welcome banner">✕</button>
   </div>
@@ -2299,6 +2363,14 @@ function init() {
   document.getElementById('welcome-close').addEventListener('click', () => {
     document.getElementById('welcome-banner').hidden = true;
     localStorage.setItem('ppl_welcome_dismissed', '1');
+  });
+
+  document.querySelectorAll('.welcome-tab-card').forEach(card => {
+    card.addEventListener('click', () => {
+      navigateTo(card.dataset.tab);
+      document.getElementById('welcome-banner').hidden = true;
+      localStorage.setItem('ppl_welcome_dismissed', '1');
+    });
   });
 
   // Hash routing
