@@ -954,6 +954,44 @@
     #welcome-banner { padding: 16px; }
     .welcome-heading { font-size: 15px; }
   }
+
+  /* ── Global Filter Bar ──────────────────────────────────── */
+  #global-filter-bar {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #global-filter-bar.hidden { display: none; }
+
+  .global-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .global-filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text3);
+    min-width: 52px;
+    flex-shrink: 0;
+  }
+
+  #global-filter-bar .filter-bar { margin-bottom: 0; }
+
+  @media (max-width: 520px) {
+    #global-filter-bar { padding: 12px 14px; }
+    .global-filter-label { min-width: 44px; }
+  }
 </style>
 </head>
 <body>
@@ -1014,7 +1052,7 @@
             </svg>
           </span>
           <span class="welcome-tab-name">Library</span>
-          <span class="welcome-tab-desc">Browse the 6 essential FAA documents and 6 recommended books for your PPL.</span>
+          <span class="welcome-tab-desc">Browse the 6 essential FAA documents and 5 recommended books for your PPL.</span>
         </button>
         <button class="welcome-tab-card" data-tab="videos" role="listitem">
           <span class="welcome-tab-icon" aria-hidden="true">
@@ -1040,6 +1078,29 @@
     <button class="icon-btn" id="welcome-close" title="Dismiss" aria-label="Dismiss welcome banner">✕</button>
   </div>
 </aside>
+
+<!-- ══════════════════════════════════════════
+     GLOBAL FILTER BAR (Library / Videos / Tools)
+══════════════════════════════════════════ -->
+<div id="global-filter-bar" class="hidden" aria-label="Global filters">
+  <div class="global-filter-row">
+    <span class="global-filter-label">Stage</span>
+    <div class="filter-bar" id="milestone-filters">
+      <button class="filter-btn active" data-milestone="all">All Stages</button>
+      <button class="filter-btn" data-milestone="pre-solo">Pre-Solo</button>
+      <button class="filter-btn" data-milestone="cross-country">Cross-Country</button>
+      <button class="filter-btn" data-milestone="checkride-prep">Checkride Prep</button>
+    </div>
+  </div>
+  <div class="global-filter-row">
+    <span class="global-filter-label">Budget</span>
+    <div class="filter-bar" id="cost-filters">
+      <button class="filter-btn active" data-cost="all">All</button>
+      <button class="filter-btn" data-cost="free">Free</button>
+      <button class="filter-btn" data-cost="paid">Paid</button>
+    </div>
+  </div>
+</div>
 
   <!-- ─── LIBRARY TAB ───────────────────────────────────── -->
   <section id="tab-library" class="tab-panel">
@@ -1262,7 +1323,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>
         </span>
         <span class="welcome-tab-name">Library</span>
-        <span class="welcome-tab-desc">Browse the 6 essential FAA documents and 6 recommended books for your PPL.</span>
+        <span class="welcome-tab-desc">Browse the 6 essential FAA documents and 5 recommended books for your PPL.</span>
       </button>
       <button class="welcome-tab-card" data-tab="videos" id="about-modal-videos" role="listitem">
         <span class="welcome-tab-icon" aria-hidden="true">
@@ -1339,7 +1400,9 @@ const FAA_DOCS = [
     when: 'Start here, read early and often. Return to specific chapters as topics come up in training.',
     chapters: 'Ch. 1 Intro · Ch. 4 Aerodynamics · Ch. 7 Aircraft Systems · Ch. 11–12 Weather · Ch. 14 Airspace · Ch. 15 Communication · Ch. 16 Navigation',
     url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/phak',
-    type: 'faa'
+    type: 'faa',
+    cost: 'free',
+    milestone: 'all',
   },
   {
     id: 'afh',
@@ -1351,7 +1414,9 @@ const FAA_DOCS = [
     when: 'Read the chapter for whichever maneuver you\'re practicing that week.',
     chapters: 'Ch. 3 Basic Maneuvers · Ch. 4 Stalls · Ch. 5 Takeoff/Landing · Ch. 9 Traffic Pattern · Ch. 17 Emergencies',
     url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook',
-    type: 'faa'
+    type: 'faa',
+    cost: 'free',
+    milestone: 'all',
   },
   {
     id: 'aim',
@@ -1363,19 +1428,23 @@ const FAA_DOCS = [
     when: 'Reference Chapter 4 early for radio calls; Chapter 7 for weather services before cross-countries.',
     chapters: 'Ch. 2 Aeronautical Lighting · Ch. 3 Airspace · Ch. 4 ATC/Radio · Ch. 5 Procedures · Ch. 7 Safety of Flight',
     url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/',
-    type: 'faa'
+    type: 'faa',
+    cost: 'free',
+    milestone: 'all',
   },
   {
     id: 'far',
     shortName: 'FAR',
     tag: 'The Rules',
-    code: '14 CFR',
+    code: '14 CFR Parts 61 & 91',
     fullTitle: 'Federal Aviation Regulations (14 CFR)',
     what: 'The actual law governing aviation. Part 61 covers pilot certification; Part 91 covers operating rules for general aviation.',
     when: 'Skim Part 61 and Part 91 for the written exam. Return to specific rules when questions arise.',
     chapters: 'Part 61 Pilot Certification · Part 91 Operating Rules · Part 67 Medical · Part 43 Maintenance',
     url: 'https://www.ecfr.gov/current/title-14',
-    type: 'faa'
+    type: 'faa',
+    cost: 'free',
+    milestone: 'all',
   },
   {
     id: 'acs',
@@ -1387,7 +1456,9 @@ const FAA_DOCS = [
     when: 'Read cover-to-cover 2–3 months before your checkride. Use it to guide your final prep.',
     chapters: 'Section I Pre-Flight · Section III Radio · Section V Takeoff/Landing · Section VII Stalls · Section IX Emergency',
     url: 'https://www.faa.gov/training_testing/testing/acs',
-    type: 'faa'
+    type: 'faa',
+    cost: 'free',
+    milestone: 'checkride-prep',
   },
   {
     id: 'wx',
@@ -1399,7 +1470,9 @@ const FAA_DOCS = [
     when: 'Study Chapters 1–4 early for theory. Chapters 11–13 before starting cross-country flying.',
     chapters: 'Ch. 1–4 Atmosphere & Clouds · Ch. 7 Precipitation · Ch. 10 Thunderstorms · Ch. 11–13 Weather Products',
     url: 'https://www.faa.gov/regulationspolicies/handbooksmanuals/aviation/faa-h-8083-28-aviation-weather-handbook',
-    type: 'faa'
+    type: 'faa',
+    cost: 'free',
+    milestone: 'cross-country',
   }
 ];
 
@@ -1414,7 +1487,9 @@ const BOOKS = [
     when: 'Read early to build an intuitive feel. Chapters 7–8 are essential before stall training.',
     chapters: 'Ch. 1 The Pilot\'s Viewpoint · Ch. 7 Stalls · Ch. 8 Spins · Ch. 11 Landings',
     url: 'https://www.amazon.com/dp/0070362408',
-    type: 'book'
+    type: 'book',
+    cost: 'paid',
+    milestone: 'pre-solo',
   },
   {
     id: 'killing-zone',
@@ -1426,19 +1501,9 @@ const BOOKS = [
     when: 'Read before your first solo cross-country. Then re-read before your checkride.',
     chapters: 'Ch. 1 The Zone · Ch. 3 Decision Making · Ch. 5 Weather · Ch. 8 Avoiding the Zone',
     url: 'https://www.amazon.com/dp/0071798781',
-    type: 'book'
-  },
-  {
-    id: 'rod-machado',
-    shortName: "Rod Machado's PPL Handbook",
-    tag: 'Best Written Exam Prep',
-    code: 'Rod Machado',
-    fullTitle: "Rod Machado's Private Pilot Handbook",
-    what: 'The most approachable and entertaining ground school book available. Covers the same material as the PHAK but with humor and memorable explanations.',
-    when: 'Great alternative or supplement to the PHAK. Excellent for written test prep.',
-    chapters: 'Full ground school coverage · Aerodynamics · Weather · Navigation · Regulations',
-    url: 'https://www.amazon.com/dp/0971201579',
-    type: 'book'
+    type: 'book',
+    cost: 'paid',
+    milestone: 'checkride-prep',
   },
   {
     id: 'say-again',
@@ -1450,19 +1515,9 @@ const BOOKS = [
     when: 'Read before your first flight into controlled airspace. Keep as a reference throughout training.',
     chapters: 'Full book covers radio calls · Ground · ATIS · Tower · Approach · Emergencies',
     url: 'https://www.amazon.com/dp/1619549085',
-    type: 'book'
-  },
-  {
-    id: 'fate-hunter',
-    shortName: 'Fate Is the Hunter',
-    tag: 'Inspiration',
-    code: 'Ernest K. Gann · 1961',
-    fullTitle: 'Fate Is the Hunter',
-    what: 'A memoir of early airline flying that captures the romance, danger, and discipline of aviation better than anything else ever written. A reminder of why flying matters.',
-    when: 'Read whenever you need motivation or perspective. Perfect for a rest day.',
-    chapters: 'Memoir format · Pre-war · War years · Airline flying · Close calls',
-    url: 'https://www.amazon.com/dp/0671636030',
-    type: 'book'
+    type: 'book',
+    cost: 'paid',
+    milestone: 'pre-solo',
   },
   {
     id: 'weather-flying',
@@ -1474,31 +1529,61 @@ const BOOKS = [
     when: 'Read after you understand weather basics. Excellent preparation for instrument and advanced flying.',
     chapters: 'Whole book · Thunderstorms · Icing · Go/No-Go · Decision Making',
     url: 'https://www.amazon.com/dp/0070088802',
-    type: 'book'
-  }
+    type: 'book',
+    cost: 'paid',
+    milestone: 'cross-country',
+  },
+  {
+    id: 'fate-hunter',
+    shortName: 'Fate Is the Hunter',
+    tag: 'Inspiration',
+    code: 'Ernest K. Gann · 1961',
+    fullTitle: 'Fate Is the Hunter',
+    what: 'A memoir of early airline flying that captures the romance, danger, and discipline of aviation better than anything else ever written. A reminder of why flying matters.',
+    when: 'Read whenever you need motivation or perspective. Perfect for a rest day.',
+    chapters: 'Memoir format · Pre-war · War years · Airline flying · Close calls',
+    url: 'https://www.amazon.com/dp/0671636030',
+    type: 'book',
+    cost: 'paid',
+    milestone: 'all',
+  },
 ];
 
 const VIDEOS_SEED = [
-  { id: 'v-1', title: "Complete Private Pilot Ground Course (Lesson 1)", channel: 'Free Pilot Training', videoId: 'pe5Fx6QxSc4', tags: [], saved: false },
-  { id: 'v-2', title: 'How To Fly a Standard Traffic Pattern', channel: 'MzeroA Flight Training', videoId: '7xGsNgbA_oM', tags: ['landing'], saved: false },
-  { id: 'v-3', title: 'Pilot Perspectives: First Solos', channel: 'FlightChops', videoId: 'SddWZiO2Atw', tags: [], saved: false },
-  { id: 'v-4', title: 'VFR Communications Training Course', channel: "Sporty's Pilot Shop", videoId: 'NAKAabmD2dA', tags: ['radio'], saved: false },
-  { id: 'v-5', title: 'Visualizing Traffic Pattern Entries', channel: 'Fly8MA', videoId: 'qsSOWcnyZj0', tags: ['landing'], saved: false },
-  { id: 'v-6', title: 'Aircraft Stalls Explained: Angle of Attack', channel: 'Pilot Institute', videoId: 'I5H8PMfB-vE', tags: [], saved: false },
-  { id: 'v-7', title: 'How to Read METARs and TAFs', channel: 'Aviation Weather', videoId: 'Mat4pMtmw7M', tags: ['weather'], saved: false },
-  { id: 'v-8', title: 'VOR Navigation: Ace Your Private Pilot Written Test', channel: 'King Schools', videoId: 'RKksJLMmg2M', tags: [], saved: false },
+  { id: 'v-1', title: "Complete Private Pilot Ground Course (Lesson 1)", channel: 'Free Pilot Training', videoId: 'pe5Fx6QxSc4', tags: [], saved: false, cost: 'free', milestone: 'pre-solo' },
+  { id: 'v-2', title: 'How To Fly a Standard Traffic Pattern', channel: 'MzeroA Flight Training', videoId: '7xGsNgbA_oM', tags: ['landing'], saved: false, cost: 'free', milestone: 'pre-solo' },
+  { id: 'v-3', title: 'Pilot Perspectives: First Solos', channel: 'FlightChops', videoId: 'SddWZiO2Atw', tags: [], saved: false, cost: 'free', milestone: 'pre-solo' },
+  { id: 'v-4', title: 'VFR Communications Training Course', channel: "Sporty's Pilot Shop", videoId: 'NAKAabmD2dA', tags: ['radio'], saved: false, cost: 'free', milestone: 'pre-solo' },
+  { id: 'v-5', title: 'Visualizing Traffic Pattern Entries', channel: 'Fly8MA', videoId: 'qsSOWcnyZj0', tags: ['landing'], saved: false, cost: 'free', milestone: 'pre-solo' },
+  { id: 'v-6', title: 'Aircraft Stalls Explained: Angle of Attack', channel: 'Pilot Institute', videoId: 'I5H8PMfB-vE', tags: [], saved: false, cost: 'free', milestone: 'pre-solo' },
+  { id: 'v-7', title: 'How to Read METARs and TAFs', channel: 'Aviation Weather', videoId: 'Mat4pMtmw7M', tags: ['weather'], saved: false, cost: 'free', milestone: 'cross-country' },
+  { id: 'v-8', title: 'VOR Navigation: Ace Your Private Pilot Written Test', channel: 'King Schools', videoId: 'RKksJLMmg2M', tags: [], saved: false, cost: 'free', milestone: 'cross-country' },
 ];
 
 const TOOLS_SEED = [
   {
-    id: 't-sportys',
-    name: "Sporty's Learn To Fly Course",
+    id: 't-liveatc',
+    name: 'LiveATC.net',
     type: 'web',
-    tag: 'Ground School',
-    what: "Complete video ground school covering every written test topic, plus practice tests and progress tracking. One of the most popular courses for PPL students.",
-    bestFor: 'Systematic written test prep and structured ground school study.',
-    url: 'https://www.sportys.com/learn-to-fly-course.html',
+    tag: 'ATC Audio',
+    what: 'Real-time ATC audio streams from airports worldwide. Listen to actual controller-pilot conversations to learn radio phraseology and how ATC works in practice.',
+    bestFor: 'Ear-training for radio communications. Listen daily before your first solo to familiarize yourself with real ATC calls.',
+    url: 'https://www.liveatc.net',
     saved: false,
+    cost: 'free',
+    milestone: 'pre-solo',
+  },
+  {
+    id: 't-skyvector',
+    name: 'SkyVector',
+    type: 'web',
+    tag: 'Chart Practice',
+    what: 'Free web-based sectional chart viewer covering the entire US. Includes IFR charts, airport diagrams, NOTAMs, and basic flight planning tools.',
+    bestFor: 'Practicing sectional chart reading, airspace identification, and cross-country route planning.',
+    url: 'https://skyvector.com',
+    saved: false,
+    cost: 'free',
+    milestone: 'cross-country',
   },
   {
     id: 't-chairfly',
@@ -1509,6 +1594,8 @@ const TOOLS_SEED = [
     bestFor: 'Whenever you have 5 minutes and want to test yourself rather than read or watch.',
     url: 'https://lloydfaulkner.github.io/chairfly',
     saved: false,
+    cost: 'free',
+    milestone: 'pre-solo',
   },
   {
     id: 't-chairfly-posters',
@@ -1520,26 +1607,44 @@ const TOOLS_SEED = [
     bestFor: 'Desk or wall reference during ground study. Great for visualizing pattern entries and maneuver geometry.',
     url: 'https://www.google.com/search?q=chairfly+posters',
     saved: false,
+    cost: 'free',
+    milestone: 'all',
+  },
+  {
+    id: 't-sportys',
+    name: "Sporty's Learn To Fly Course",
+    type: 'web',
+    tag: 'Ground School',
+    what: "Complete video ground school covering every written test topic, plus practice tests and progress tracking. One of the most popular courses for PPL students.",
+    bestFor: 'Systematic written test prep and structured ground school study.',
+    url: 'https://www.sportys.com/learn-to-fly-course.html',
+    saved: false,
+    cost: 'paid',
+    milestone: 'checkride-prep',
   },
   {
     id: 't-king',
-    name: 'King Schools',
+    name: 'King Schools Ground School',
     type: 'web',
     tag: 'Written Test Prep',
     what: 'Video-based ground school and written test prep from John and Martha King. Known for thorough topic coverage and approachable teaching style.',
     bestFor: 'Written test prep, especially if you prefer structured video-based lessons.',
     url: 'https://www.kingschools.com',
     saved: false,
+    cost: 'paid',
+    milestone: 'checkride-prep',
   },
   {
     id: 't-gleim',
-    name: 'Gleim Aviation',
+    name: 'Gleim Aviation Test Prep',
     type: 'web',
     tag: 'Question Bank',
     what: 'The largest FAA written test question bank available, with detailed explanations for every answer. Industry-standard tool for PPL knowledge test prep.',
     bestFor: 'Drilling FAA knowledge test questions in the final weeks before your written exam.',
     url: 'https://www.gleimaviation.com',
     saved: false,
+    cost: 'paid',
+    milestone: 'checkride-prep',
   },
   {
     id: 't-foreflight',
@@ -1550,6 +1655,8 @@ const TOOLS_SEED = [
     bestFor: 'Pre-flight planning, in-flight moving map, and weather briefings for cross-countries.',
     url: 'https://foreflight.com',
     saved: false,
+    cost: 'paid',
+    milestone: 'cross-country',
   },
   {
     id: 't-msfs',
@@ -1560,6 +1667,8 @@ const TOOLS_SEED = [
     bestFor: 'Procedure practice, navigation drills, and productive study on days you cannot fly.',
     url: 'https://www.flightsimulator.com',
     saved: false,
+    cost: 'paid',
+    milestone: 'all',
   },
   {
     id: 't-infinite-flight',
@@ -1570,16 +1679,8 @@ const TOOLS_SEED = [
     bestFor: 'Pattern work, instrument scan practice, and radio/ATC familiarization on your phone or tablet.',
     url: 'https://infiniteflight.com',
     saved: false,
-  },
-  {
-    id: 't-skyvector',
-    name: 'SkyVector',
-    type: 'web',
-    tag: 'Chart Practice',
-    what: 'Free web-based sectional chart viewer covering the entire US. Includes IFR charts, airport diagrams, NOTAMs, and basic flight planning tools.',
-    bestFor: 'Practicing sectional chart reading, airspace identification, and cross-country route planning.',
-    url: 'https://skyvector.com',
-    saved: false,
+    cost: 'paid',
+    milestone: 'all',
   },
 ];
 
@@ -1740,7 +1841,7 @@ const TOPICS = [
       { source: 'ACS', detail: 'Whole document', note: 'Read cover-to-cover — this IS the checkride rubric', url: ACS_PDF },
       { source: 'AFH', detail: 'Review all', note: 'Maneuver standards directly from ACS', url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook' },
       { source: 'FAR', detail: 'Parts 61 & 91', note: 'Regulations commonly tested on oral', url: 'https://www.ecfr.gov/current/title-14/part-61' },
-      { source: 'Rod Machado', detail: 'Full book', note: 'Best written test prep available' },
+      { source: 'Killing Zone', detail: 'Whole book', note: 'Aeronautical decision making and safety judgment for the oral' },
     ]
   },
 ];
@@ -1749,8 +1850,7 @@ const TOPICS = [
 const SOURCE_TO_CARD = {
   'PHAK': 'phak', 'AFH': 'afh', 'AIM': 'aim', 'FAR': 'far', 'ACS': 'acs',
   'Wx Handbook': 'wx', 'Stick & Rudder': 'stick-rudder', 'Killing Zone': 'killing-zone',
-  'Rod Machado': 'rod-machado', 'Say Again': 'say-again', 'Fate Is Hunter': 'fate-hunter',
-  'Weather Flying': 'weather-flying',
+  'Say Again': 'say-again', 'Fate Is Hunter': 'fate-hunter', 'Weather Flying': 'weather-flying',
 };
 
 // LLM model lists
@@ -1779,6 +1879,8 @@ let savedVideos = [];
 let savedTools = [];
 let llmSettings = { provider: 'anthropic', model: 'claude-sonnet-4-6', apiKey: '', endpoint: '' };
 let nightMode = false;
+let globalMilestone = 'all'; // 'all' | 'pre-solo' | 'cross-country' | 'checkride-prep'
+let globalCost = 'all';      // 'all' | 'free' | 'paid'
 
 function loadState() {
   const sv = localStorage.getItem('ppl_saved_videos');
@@ -1831,11 +1933,23 @@ function navigateTo(tab) {
   document.getElementById('tab-' + tab).classList.add('active');
   document.querySelectorAll(`[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
   history.replaceState(null, '', '#' + tab);
+  document.getElementById('global-filter-bar').classList.toggle('hidden', tab === 'advisor');
 }
 
 // ════════════════════════════════════════════════════════════
 // LIBRARY RENDER
 // ════════════════════════════════════════════════════════════
+
+function applyGlobalFilter(items) {
+  return items.filter(item => {
+    const milestoneOk = globalMilestone === 'all'
+      || !item.milestone
+      || item.milestone === 'all'
+      || item.milestone === globalMilestone;
+    const costOk = globalCost === 'all' || !item.cost || item.cost === globalCost;
+    return milestoneOk && costOk;
+  });
+}
 
 function sortResources(list) {
   const { col, dir } = libSort;
@@ -1863,7 +1977,8 @@ function setSort(col) {
 function renderLibrary() {
   const container = document.getElementById('library-grid');
   const all = [...FAA_DOCS, ...BOOKS];
-  const filtered = libFilter === 'all' ? all : all.filter(r => r.type === libFilter);
+  let filtered = libFilter === 'all' ? all : all.filter(r => r.type === libFilter);
+  filtered = applyGlobalFilter(filtered);
 
   if (libView === 'list') {
     container.style.display = 'block';
@@ -1938,11 +2053,12 @@ function renderVideos() {
     ...savedVideos.map(v => ({ ...v, saved: true }))
   ];
 
-  const filtered = allVideos.filter(v => {
+  let filtered = allVideos.filter(v => {
     if (vidFilter === 'all') return true;
     if (vidFilter === 'saved') return v.saved;
     return (v.tags || []).includes(vidFilter);
   });
+  filtered = applyGlobalFilter(filtered);
 
   if (filtered.length === 0) {
     grid.innerHTML = `<p style="color:var(--text3); font-size:14px; grid-column:1/-1;">No videos match this filter.</p>`;
@@ -1997,11 +2113,12 @@ function renderTools() {
     ...savedTools.map(t => ({ ...t, saved: true }))
   ];
 
-  const filtered = allTools.filter(t => {
+  let filtered = allTools.filter(t => {
     if (toolFilter === 'all') return true;
     if (toolFilter === 'saved') return t.saved;
     return t.type === toolFilter;
   });
+  filtered = applyGlobalFilter(filtered);
 
   if (filtered.length === 0) {
     grid.style.display = '';
@@ -2562,6 +2679,30 @@ function init() {
     toolFilter = btn.dataset.filter;
     document.querySelectorAll('#tools-filters .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    renderTools();
+  });
+
+  // Global milestone filter
+  document.getElementById('milestone-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    globalMilestone = btn.dataset.milestone;
+    document.querySelectorAll('#milestone-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLibrary();
+    renderVideos();
+    renderTools();
+  });
+
+  // Global cost filter
+  document.getElementById('cost-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    globalCost = btn.dataset.cost;
+    document.querySelectorAll('#cost-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLibrary();
+    renderVideos();
     renderTools();
   });
 
