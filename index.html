@@ -927,6 +927,7 @@
     <button class="nav-btn" data-tab="tools">Tools</button>
   </nav>
   <div id="topbar-actions">
+    <button class="icon-btn" id="about-btn" title="About this app">ℹ️</button>
     <button class="icon-btn" id="theme-toggle" title="Toggle day/night">☀️</button>
     <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
   </div>
@@ -2323,6 +2324,14 @@ function init() {
     nightMode = !nightMode;
     localStorage.setItem('ppl_theme', nightMode ? 'night' : 'day');
     applyTheme();
+  });
+
+  // About (re-show welcome banner)
+  document.getElementById('about-btn').addEventListener('click', () => {
+    const banner = document.getElementById('welcome-banner');
+    banner.hidden = false;
+    localStorage.removeItem('ppl_welcome_dismissed');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   // Settings
