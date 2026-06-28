@@ -955,28 +955,22 @@
     .welcome-heading { font-size: 15px; }
   }
 
-  /* ── Global Filter Bar ──────────────────────────────────── */
-  #global-filter-bar {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow);
+  /* ── Per-section metadata filters (Stage + Budget) ─────── */
+  .meta-filters {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+    margin-bottom: 22px;
   }
-  #global-filter-bar.hidden { display: none; }
 
-  .global-filter-row {
+  .meta-filter-row {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
   }
 
-  .global-filter-label {
+  .meta-filter-label {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -986,11 +980,10 @@
     flex-shrink: 0;
   }
 
-  #global-filter-bar .filter-bar { margin-bottom: 0; }
+  .meta-filters .filter-bar { margin-bottom: 0; }
 
   @media (max-width: 520px) {
-    #global-filter-bar { padding: 12px 14px; }
-    .global-filter-label { min-width: 44px; }
+    .meta-filter-label { min-width: 44px; }
   }
 </style>
 </head>
@@ -1079,29 +1072,6 @@
   </div>
 </aside>
 
-<!-- ══════════════════════════════════════════
-     GLOBAL FILTER BAR (Library / Videos / Tools)
-══════════════════════════════════════════ -->
-<div id="global-filter-bar" class="hidden" aria-label="Global filters">
-  <div class="global-filter-row">
-    <span class="global-filter-label">Stage</span>
-    <div class="filter-bar" id="milestone-filters">
-      <button class="filter-btn active" data-milestone="all">All Stages</button>
-      <button class="filter-btn" data-milestone="pre-solo">Pre-Solo</button>
-      <button class="filter-btn" data-milestone="cross-country">Cross-Country</button>
-      <button class="filter-btn" data-milestone="checkride-prep">Checkride Prep</button>
-    </div>
-  </div>
-  <div class="global-filter-row">
-    <span class="global-filter-label">Budget</span>
-    <div class="filter-bar" id="cost-filters">
-      <button class="filter-btn active" data-cost="all">All</button>
-      <button class="filter-btn" data-cost="free">Free</button>
-      <button class="filter-btn" data-cost="paid">Paid</button>
-    </div>
-  </div>
-</div>
-
   <!-- ─── LIBRARY TAB ───────────────────────────────────── -->
   <section id="tab-library" class="tab-panel">
     <h1 class="section-heading">Resource Library</h1>
@@ -1115,6 +1085,25 @@
       <div class="view-toggle">
         <button class="view-btn active" id="view-card" title="Card view">⊞</button>
         <button class="view-btn" id="view-list" title="List view">☰</button>
+      </div>
+    </div>
+    <div class="meta-filters">
+      <div class="meta-filter-row">
+        <span class="meta-filter-label">Stage</span>
+        <div class="filter-bar" id="lib-milestone-filters">
+          <button class="filter-btn active" data-milestone="all">All Stages</button>
+          <button class="filter-btn" data-milestone="pre-solo">Pre-Solo</button>
+          <button class="filter-btn" data-milestone="cross-country">Cross-Country</button>
+          <button class="filter-btn" data-milestone="checkride-prep">Checkride Prep</button>
+        </div>
+      </div>
+      <div class="meta-filter-row">
+        <span class="meta-filter-label">Budget</span>
+        <div class="filter-bar" id="lib-cost-filters">
+          <button class="filter-btn active" data-cost="all">All</button>
+          <button class="filter-btn" data-cost="free">Free</button>
+          <button class="filter-btn" data-cost="paid">Paid</button>
+        </div>
       </div>
     </div>
     <div class="cards-grid" id="library-grid"></div>
@@ -1135,6 +1124,25 @@
       <button class="filter-btn" data-filter="weather">Weather</button>
       <button class="filter-btn" data-filter="radio">Radio</button>
       <button class="filter-btn" data-filter="landing">Landing</button>
+    </div>
+    <div class="meta-filters">
+      <div class="meta-filter-row">
+        <span class="meta-filter-label">Stage</span>
+        <div class="filter-bar" id="vid-milestone-filters">
+          <button class="filter-btn active" data-milestone="all">All Stages</button>
+          <button class="filter-btn" data-milestone="pre-solo">Pre-Solo</button>
+          <button class="filter-btn" data-milestone="cross-country">Cross-Country</button>
+          <button class="filter-btn" data-milestone="checkride-prep">Checkride Prep</button>
+        </div>
+      </div>
+      <div class="meta-filter-row">
+        <span class="meta-filter-label">Budget</span>
+        <div class="filter-bar" id="vid-cost-filters">
+          <button class="filter-btn active" data-cost="all">All</button>
+          <button class="filter-btn" data-cost="free">Free</button>
+          <button class="filter-btn" data-cost="paid">Paid</button>
+        </div>
+      </div>
     </div>
     <div class="cards-grid" id="videos-grid"></div>
   </section>
@@ -1160,6 +1168,25 @@
       <div class="view-toggle">
         <button class="view-btn active" id="view-card-tools" title="Card view">⊞</button>
         <button class="view-btn" id="view-list-tools" title="List view">☰</button>
+      </div>
+    </div>
+    <div class="meta-filters">
+      <div class="meta-filter-row">
+        <span class="meta-filter-label">Stage</span>
+        <div class="filter-bar" id="tool-milestone-filters">
+          <button class="filter-btn active" data-milestone="all">All Stages</button>
+          <button class="filter-btn" data-milestone="pre-solo">Pre-Solo</button>
+          <button class="filter-btn" data-milestone="cross-country">Cross-Country</button>
+          <button class="filter-btn" data-milestone="checkride-prep">Checkride Prep</button>
+        </div>
+      </div>
+      <div class="meta-filter-row">
+        <span class="meta-filter-label">Budget</span>
+        <div class="filter-bar" id="tool-cost-filters">
+          <button class="filter-btn active" data-cost="all">All</button>
+          <button class="filter-btn" data-cost="free">Free</button>
+          <button class="filter-btn" data-cost="paid">Paid</button>
+        </div>
       </div>
     </div>
     <div class="cards-grid" id="tools-grid"></div>
@@ -1879,8 +1906,9 @@ let savedVideos = [];
 let savedTools = [];
 let llmSettings = { provider: 'anthropic', model: 'claude-sonnet-4-6', apiKey: '', endpoint: '' };
 let nightMode = false;
-let globalMilestone = 'all'; // 'all' | 'pre-solo' | 'cross-country' | 'checkride-prep'
-let globalCost = 'all';      // 'all' | 'free' | 'paid'
+let libMilestone = 'all';  let libCost = 'all';
+let vidMilestone = 'all';  let vidCost = 'all';
+let toolMilestone = 'all'; let toolCost = 'all';
 
 function loadState() {
   const sv = localStorage.getItem('ppl_saved_videos');
@@ -1933,20 +1961,19 @@ function navigateTo(tab) {
   document.getElementById('tab-' + tab).classList.add('active');
   document.querySelectorAll(`[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
   history.replaceState(null, '', '#' + tab);
-  document.getElementById('global-filter-bar').classList.toggle('hidden', tab === 'advisor');
 }
 
 // ════════════════════════════════════════════════════════════
 // LIBRARY RENDER
 // ════════════════════════════════════════════════════════════
 
-function applyGlobalFilter(items) {
+function applyMetaFilter(items, milestone, cost) {
   return items.filter(item => {
-    const milestoneOk = globalMilestone === 'all'
+    const milestoneOk = milestone === 'all'
       || !item.milestone
       || item.milestone === 'all'
-      || item.milestone === globalMilestone;
-    const costOk = globalCost === 'all' || !item.cost || item.cost === globalCost;
+      || item.milestone === milestone;
+    const costOk = cost === 'all' || !item.cost || item.cost === cost;
     return milestoneOk && costOk;
   });
 }
@@ -1978,7 +2005,7 @@ function renderLibrary() {
   const container = document.getElementById('library-grid');
   const all = [...FAA_DOCS, ...BOOKS];
   let filtered = libFilter === 'all' ? all : all.filter(r => r.type === libFilter);
-  filtered = applyGlobalFilter(filtered);
+  filtered = applyMetaFilter(filtered, libMilestone, libCost);
 
   if (libView === 'list') {
     container.style.display = 'block';
@@ -2058,7 +2085,7 @@ function renderVideos() {
     if (vidFilter === 'saved') return v.saved;
     return (v.tags || []).includes(vidFilter);
   });
-  filtered = applyGlobalFilter(filtered);
+  filtered = applyMetaFilter(filtered, vidMilestone, vidCost);
 
   if (filtered.length === 0) {
     grid.innerHTML = `<p style="color:var(--text3); font-size:14px; grid-column:1/-1;">No videos match this filter.</p>`;
@@ -2118,7 +2145,7 @@ function renderTools() {
     if (toolFilter === 'saved') return t.saved;
     return t.type === toolFilter;
   });
-  filtered = applyGlobalFilter(filtered);
+  filtered = applyMetaFilter(filtered, toolMilestone, toolCost);
 
   if (filtered.length === 0) {
     grid.style.display = '';
@@ -2682,27 +2709,57 @@ function init() {
     renderTools();
   });
 
-  // Global milestone filter
-  document.getElementById('milestone-filters').addEventListener('click', e => {
+  // Library stage + budget filters
+  document.getElementById('lib-milestone-filters').addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
-    globalMilestone = btn.dataset.milestone;
-    document.querySelectorAll('#milestone-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    libMilestone = btn.dataset.milestone;
+    document.querySelectorAll('#lib-milestone-filters .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderLibrary();
-    renderVideos();
-    renderTools();
+  });
+  document.getElementById('lib-cost-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    libCost = btn.dataset.cost;
+    document.querySelectorAll('#lib-cost-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLibrary();
   });
 
-  // Global cost filter
-  document.getElementById('cost-filters').addEventListener('click', e => {
+  // Videos stage + budget filters
+  document.getElementById('vid-milestone-filters').addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
-    globalCost = btn.dataset.cost;
-    document.querySelectorAll('#cost-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    vidMilestone = btn.dataset.milestone;
+    document.querySelectorAll('#vid-milestone-filters .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderLibrary();
     renderVideos();
+  });
+  document.getElementById('vid-cost-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    vidCost = btn.dataset.cost;
+    document.querySelectorAll('#vid-cost-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderVideos();
+  });
+
+  // Tools stage + budget filters
+  document.getElementById('tool-milestone-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    toolMilestone = btn.dataset.milestone;
+    document.querySelectorAll('#tool-milestone-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTools();
+  });
+  document.getElementById('tool-cost-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    toolCost = btn.dataset.cost;
+    document.querySelectorAll('#tool-cost-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
     renderTools();
   });
 
