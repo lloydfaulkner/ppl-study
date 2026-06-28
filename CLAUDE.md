@@ -26,9 +26,9 @@ GitHub Actions deploys automatically on push to `main`. The workflow (`.github/w
 1. **Study Advisor** — 15 topics in 4 groups (Maneuvers, Nav & Weather, Aircraft, Rules & Exam) → static chapter recommendations → clickable rows open the source directly (FAA docs open the specific chapter PDF or HTML in a new tab ↗; books jump to the Library card with pulse highlight →). AI tips button if API key set.
    - **Desktop**: sticky 220px sidebar with group section labels + vertical chip list; recommendation panel to the right.
    - **Mobile (≤680px)**: iOS-style segmented control (4 group tabs in a shared container) → 2-column chip grid for the active group → recommendation panel below. Heading hidden, empty panel hidden until a topic is selected. Active group syncs when a topic is selected.
-2. **Library** — 6 FAA docs + 6 books. Filter: All / FAA Official / Books. Card/list view toggle. Cards have "What it is" + "When to read it" only (no chapter breakdown — that lives in Study Advisor).
+2. **Library** — 6 FAA docs + 5 books. Filter: All / FAA Official / Books. Card/list view toggle. Cards have "What it is" + "When to read it" only (no chapter breakdown — that lives in Study Advisor).
 3. **Videos** — 8 seeded YouTube videos + user-saved. Filter: All / My Saved / Weather / Radio / Landing. "+ Save a Video" modal saves to localStorage.
-4. **Tools** — 9 seeded study tools + user-saved. Filter: All / My Saved / Apps / Web Tools / Simulators / Posters. Card/list view toggle. "+ Add a Tool" modal saves to localStorage. Card titles are tappable links when a URL is present. Tools can have an optional `tip` field that renders italic/muted below the description.
+4. **Tools** — 10 seeded study tools + user-saved. Filter: All / My Saved / Apps / Web Tools / Simulators / Posters. Card/list view toggle. "+ Add a Tool" modal saves to localStorage. Card titles are tappable links when a URL is present. Tools can have an optional `tip` field that renders italic/muted below the description.
 
 **Settings modal** (gear icon): LLM provider (Anthropic/OpenAI/custom), model dropdown, API key (localStorage only).
 
@@ -36,14 +36,18 @@ GitHub Actions deploys automatically on push to `main`. The workflow (`.github/w
 
 ## Key data
 
-- `FAA_DOCS` — 6 resources: PHAK, AFH, AIM, FAR, ACS, Wx Handbook
-- `BOOKS` — 6 books: Stick & Rudder, Killing Zone, Rod Machado, Say Again, Fate Is Hunter, Weather Flying
-- `VIDEOS_SEED` — 8 seeded videos (IDs verified June 2026)
-- `TOOLS_SEED` — 9 seeded tools: Sporty's, Chairfly Dash, Chairfly Posters, King Schools, Gleim, ForeFlight, MSFS, Infinite Flight, SkyVector
+- `FAA_DOCS` — 6 resources: PHAK, AFH, AIM, FAR, ACS, Wx Handbook. Each item has `cost: "free"` and a `milestone` field (`"all"` | `"pre-solo"` | `"cross-country"` | `"checkride-prep"`).
+- `BOOKS` — 5 books: Stick & Rudder, Killing Zone, Say Again, Fate Is Hunter, Weather Flying. Each item has `cost: "paid"` and a `milestone` field.
+- `VIDEOS_SEED` — 8 seeded videos (IDs verified June 2026). Each item has `cost: "free"` and a `milestone` field.
+- `TOOLS_SEED` — 10 seeded tools: LiveATC.net, SkyVector, Chairfly Dash, Chairfly Posters, Sporty's, King Schools, Gleim, ForeFlight, MSFS, Infinite Flight. Each item has `cost` and `milestone` fields.
 - `TOOL_TYPE_LABEL` — maps type keys (`app`, `web`, `sim`, `poster`) to display labels
 - `TOPICS` — 15 advisor topics, each with a `group` field (Maneuvers / Nav & Weather / Aircraft / Rules & Exam) and a `recs` array. Each rec has an optional `url` field; FAA docs link to specific chapter PDFs or AIM HTML pages, FAR links to eCFR sections, books have no `url` and fall back to library card jump. Topics are ordered by group in the array.
 - `PHAK` / `AFH` / `ACS_PDF` / `WX_PDF` — URL prefix/path constants used in TOPICS to build chapter PDF links
 - `SOURCE_TO_CARD` — maps advisor source labels to library card IDs; used as fallback when a rec has no `url` (books only)
+
+## AI advisor — data indexing note
+
+The application data contains a hardcoded list of 29 curated resources tagged by `cost` and `milestone`. When formatting prompts or context blocks for the Study Advisor feature, instruct the LLM agent to prioritize cross-referencing and recommending items from this exact local index (e.g., matching a student's struggle with solo radio communications to "Say Again, Please" or "LiveATC.net") before recommending external material.
 
 ## AI advisor
 
