@@ -732,32 +732,50 @@
     margin-top: 4px;
   }
 
-  /* ── Nav label helpers ──────────────────────────────────── */
-  .nav-label-short { display: none; }
-  .nav-label-full  { display: inline; }
+  /* ── Bottom tab bar (mobile only) ──────────────────────── */
+  .bottom-nav { display: none; }
+
+  .bottom-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text3);
+    transition: color 0.15s, background 0.15s;
+    padding: 6px 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-nav-btn.active { color: var(--blue); }
+  .bottom-nav-btn:active { background: var(--bg3); }
+
+  .bottom-nav-icon  { font-size: 20px; line-height: 1; }
+  .bottom-nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
 
   /* ── Responsive: phones (≤600px) ───────────────────────── */
   @media (max-width: 600px) {
-    #topbar {
-      flex-wrap: wrap;
-      height: auto;
-      padding: 8px 14px 0;
-      gap: 6px;
+    #nav { display: none; }
+
+    .bottom-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--bg2);
+      border-top: 2px solid var(--blue);
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.12);
+      height: 60px;
+      padding-bottom: env(safe-area-inset-bottom);
     }
-    #topbar-actions { margin-left: auto; }
-    #nav {
-      order: 3;
-      margin-left: 0;
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 8px;
-      scrollbar-width: none;
-      gap: 2px;
-    }
-    #nav::-webkit-scrollbar { display: none; }
-    .nav-label-full  { display: none; }
-    .nav-label-short { display: inline; }
+
+    #main { padding-bottom: 80px; }
   }
 
   @media (max-width: 520px) {
@@ -868,6 +886,28 @@
   </section>
 
 </main>
+
+<!-- ══════════════════════════════════════════
+     BOTTOM TAB BAR (mobile)
+══════════════════════════════════════════ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-btn active" data-tab="advisor">
+    <span class="bottom-nav-icon">🎯</span>
+    <span class="bottom-nav-label">Advisor</span>
+  </button>
+  <button class="bottom-nav-btn" data-tab="library">
+    <span class="bottom-nav-icon">📚</span>
+    <span class="bottom-nav-label">Library</span>
+  </button>
+  <button class="bottom-nav-btn" data-tab="videos">
+    <span class="bottom-nav-icon">▶️</span>
+    <span class="bottom-nav-label">Videos</span>
+  </button>
+  <button class="bottom-nav-btn" data-tab="tools">
+    <span class="bottom-nav-icon">🔧</span>
+    <span class="bottom-nav-label">Tools</span>
+  </button>
+</nav>
 
 <!-- ══════════════════════════════════════════
      SAVE VIDEO MODAL
@@ -1451,9 +1491,9 @@ function applyTheme() {
 function navigateTo(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn, .bottom-nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add('active');
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
   history.replaceState(null, '', '#' + tab);
 }
 
@@ -2016,9 +2056,13 @@ function init() {
     navigateTo('advisor');
   }
 
-  // Nav
+  // Nav (top bar + bottom tab bar)
   document.getElementById('nav').addEventListener('click', e => {
     const btn = e.target.closest('.nav-btn');
+    if (btn) navigateTo(btn.dataset.tab);
+  });
+  document.getElementById('bottom-nav').addEventListener('click', e => {
+    const btn = e.target.closest('.bottom-nav-btn');
     if (btn) navigateTo(btn.dataset.tab);
   });
 
