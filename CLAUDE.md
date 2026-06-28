@@ -23,7 +23,7 @@ GitHub Actions deploys automatically on push to `main`. The workflow (`.github/w
 
 **Four tabs** (Study Advisor is first/default):
 
-1. **Study Advisor** — 18 topic chips → static chapter recommendations → clickable rows jump to Library card with pulse highlight. AI tips button if API key set.
+1. **Study Advisor** — 15 topic chips → static chapter recommendations → clickable rows open the source directly (FAA docs open the specific chapter PDF or HTML in a new tab ↗; books jump to the Library card with pulse highlight →). AI tips button if API key set.
 2. **Library** — 6 FAA docs + 6 books. Filter: All / FAA Official / Books. Card/list view toggle. Cards have "What it is" + "When to read it" only (no chapter breakdown — that lives in Study Advisor).
 3. **Videos** — 8 seeded YouTube videos + user-saved. Filter: All / My Saved / Weather / Radio / Landing. "+ Save a Video" modal saves to localStorage.
 4. **Tools** — 9 seeded study tools + user-saved. Filter: All / My Saved / Apps / Web Tools / Simulators / Posters. Card/list view toggle. "+ Add a Tool" modal saves to localStorage. Card titles are tappable links when a URL is present. Tools can have an optional `tip` field that renders italic/muted below the description.
@@ -39,8 +39,9 @@ GitHub Actions deploys automatically on push to `main`. The workflow (`.github/w
 - `VIDEOS_SEED` — 8 seeded videos (IDs verified June 2026)
 - `TOOLS_SEED` — 9 seeded tools: Sporty's, Chairfly Dash, Chairfly Posters, King Schools, Gleim, ForeFlight, MSFS, Infinite Flight, SkyVector
 - `TOOL_TYPE_LABEL` — maps type keys (`app`, `web`, `sim`, `poster`) to display labels
-- `TOPICS` — 18 advisor topics including Aircraft Systems, Night Flying, Checkride Prep, etc.
-- `SOURCE_TO_CARD` — maps advisor source labels to library card IDs for jump-link behavior
+- `TOPICS` — 15 advisor topics including Aircraft Systems, Night Flying, Checkride Prep, etc. Each rec has an optional `url` field; FAA docs link to specific chapter PDFs or AIM HTML pages, FAR links to eCFR sections, books have no `url` and fall back to library card jump.
+- `PHAK` / `AFH` / `ACS_PDF` / `WX_PDF` — URL prefix/path constants used in TOPICS to build chapter PDF links
+- `SOURCE_TO_CARD` — maps advisor source labels to library card IDs; used as fallback when a rec has no `url` (books only)
 
 ## AI advisor
 
