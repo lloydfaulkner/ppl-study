@@ -1118,12 +1118,18 @@
       </div>
       <button class="btn btn-primary" id="save-video-btn">+ Save a Video</button>
     </div>
-    <div class="filter-bar" id="vid-filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="saved">My Saved</button>
-      <button class="filter-btn" data-filter="weather">Weather</button>
-      <button class="filter-btn" data-filter="radio">Radio</button>
-      <button class="filter-btn" data-filter="landing">Landing</button>
+    <div class="lib-toolbar">
+      <div class="filter-bar" id="vid-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="saved">My Saved</button>
+        <button class="filter-btn" data-filter="weather">Weather</button>
+        <button class="filter-btn" data-filter="radio">Radio</button>
+        <button class="filter-btn" data-filter="landing">Landing</button>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-card-videos" title="Card view">⊞</button>
+        <button class="view-btn" id="view-list-videos" title="List view">☰</button>
+      </div>
     </div>
     <div class="meta-filters">
       <div class="meta-filter-row">
@@ -1898,6 +1904,8 @@ let libFilter = 'all';
 let libView = 'card'; // 'card' | 'list'
 let libSort = { col: 'name', dir: 1 }; // col: name|title|type|tag, dir: 1 asc / -1 desc
 let vidFilter = 'all';
+let vidView = 'card';
+let vidSort = { col: 'title', dir: 1 };
 let toolFilter = 'all';
 let toolView = 'card';
 let activeTopicIdx = null;
@@ -2068,6 +2076,26 @@ function renderLibrary() {
 // VIDEO RENDER
 // ════════════════════════════════════════════════════════════
 
+function sortVideos(list) {
+  const { col, dir } = vidSort;
+  return [...list].sort((a, b) => {
+    const av = col === 'title' ? a.title : (a.channel || '');
+    const bv = col === 'title' ? b.title : (b.channel || '');
+    return av < bv ? -dir : av > bv ? dir : 0;
+  });
+}
+
+function vidSortIcon(col) {
+  if (vidSort.col !== col) return '<i class="sort-icon">↕</i>';
+  return `<i class="sort-icon">${vidSort.dir === 1 ? '↑' : '↓'}</i>`;
+}
+
+function setVidSort(col) {
+  if (vidSort.col === col) vidSort.dir *= -1;
+  else vidSort = { col, dir: 1 };
+  renderVideos();
+}
+
 function extractVideoId(url) {
   const m = url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);
   return m ? m[1] : null;
@@ -2088,39 +2116,79 @@ function renderVideos() {
   filtered = applyMetaFilter(filtered, vidMilestone, vidCost);
 
   if (filtered.length === 0) {
+    grid.style.display = '';
     grid.innerHTML = `<p style="color:var(--text3); font-size:14px; grid-column:1/-1;">No videos match this filter.</p>`;
     return;
   }
 
-  grid.innerHTML = filtered.map(v => {
-    const thumb = `https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg`;
-    const ytUrl = `https://www.youtube.com/watch?v=${v.videoId}`;
-    const tagHtml = (v.tags || []).map(t => `<span class="video-tag">${t}</span>`).join('');
-    const savedBadge = v.saved ? '<span class="video-tag" style="background:var(--magenta);color:#fff">Saved</span>' : '';
-    const deleteBtn = v.saved
-      ? `<button class="card-btn outline" onclick="deleteVideo('${v.id}')" style="font-size:12px;padding:5px 10px">🗑 Remove</button>`
-      : '';
-    return `
-      <div class="video-card">
-        <a href="${ytUrl}" target="_blank" rel="noopener">
-          <div class="video-thumb-wrap">
-            <img src="${thumb}" alt="${v.title}" loading="lazy">
-            <div class="video-play-overlay"><div class="play-icon">▶</div></div>
-          </div>
-        </a>
-        <div class="video-info">
-          <div class="video-title">${v.title}</div>
-          <div class="video-channel">${v.channel || ''}</div>
-          ${v.notes ? `<div class="video-notes">${v.notes}</div>` : ''}
-          <div class="video-tags">${savedBadge}${tagHtml}</div>
-          <div class="video-actions">
-            <a class="card-btn magenta" href="${ytUrl}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px">▶ Watch</a>
-            ${deleteBtn}
+  if (vidView === 'list') {
+    grid.style.display = 'block';
+    const sorted = sortVideos(filtered);
+    grid.innerHTML = `
+      <table class="lib-table">
+        <thead>
+          <tr>
+            <th class="${vidSort.col==='title'?'sort-active':''}" onclick="setVidSort('title')">Title ${vidSortIcon('title')}</th>
+            <th class="${vidSort.col==='channel'?'sort-active':''}" onclick="setVidSort('channel')">Channel ${vidSortIcon('channel')}</th>
+            <th>Tags</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map(v => {
+            const ytUrl = `https://www.youtube.com/watch?v=${v.videoId}`;
+            const tagHtml = (v.tags || []).map(t => `<span class="video-tag">${t}</span>`).join('');
+            const savedBadge = v.saved ? `<span class="video-tag" style="background:var(--magenta);color:#fff">Saved</span>` : '';
+            const deleteBtn = v.saved
+              ? `<button class="card-btn outline" onclick="deleteVideo('${escHtml(v.id)}')" style="font-size:12px;padding:5px 10px;margin-top:0">🗑</button>`
+              : '';
+            return `
+              <tr>
+                <td class="col-name">${escHtml(v.title)}<span class="col-name-sub">${escHtml(v.channel || '')}</span></td>
+                <td class="col-title">${escHtml(v.channel || '')}</td>
+                <td><div style="display:flex;gap:4px;flex-wrap:wrap">${savedBadge}${tagHtml}</div></td>
+                <td class="col-link" style="display:flex;gap:6px;justify-content:flex-end;align-items:center">
+                  <a class="card-btn magenta" href="${ytUrl}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px;margin-top:0">▶ Watch</a>
+                  ${deleteBtn}
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  } else {
+    grid.style.display = '';
+    grid.innerHTML = filtered.map(v => {
+      const thumb = `https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg`;
+      const ytUrl = `https://www.youtube.com/watch?v=${v.videoId}`;
+      const tagHtml = (v.tags || []).map(t => `<span class="video-tag">${t}</span>`).join('');
+      const savedBadge = v.saved ? '<span class="video-tag" style="background:var(--magenta);color:#fff">Saved</span>' : '';
+      const deleteBtn = v.saved
+        ? `<button class="card-btn outline" onclick="deleteVideo('${v.id}')" style="font-size:12px;padding:5px 10px">🗑 Remove</button>`
+        : '';
+      return `
+        <div class="video-card">
+          <a href="${ytUrl}" target="_blank" rel="noopener">
+            <div class="video-thumb-wrap">
+              <img src="${thumb}" alt="${v.title}" loading="lazy">
+              <div class="video-play-overlay"><div class="play-icon">▶</div></div>
+            </div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">${v.title}</div>
+            <div class="video-channel">${v.channel || ''}</div>
+            ${v.notes ? `<div class="video-notes">${v.notes}</div>` : ''}
+            <div class="video-tags">${savedBadge}${tagHtml}</div>
+            <div class="video-actions">
+              <a class="card-btn magenta" href="${ytUrl}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px">▶ Watch</a>
+              ${deleteBtn}
+            </div>
           </div>
         </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  }
 }
 
 function deleteVideo(id) {
@@ -2682,6 +2750,20 @@ function init() {
     vidFilter = btn.dataset.filter;
     document.querySelectorAll('#vid-filters .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    renderVideos();
+  });
+
+  // Videos view toggle
+  document.getElementById('view-card-videos').addEventListener('click', () => {
+    vidView = 'card';
+    document.getElementById('view-card-videos').classList.add('active');
+    document.getElementById('view-list-videos').classList.remove('active');
+    renderVideos();
+  });
+  document.getElementById('view-list-videos').addEventListener('click', () => {
+    vidView = 'list';
+    document.getElementById('view-list-videos').classList.add('active');
+    document.getElementById('view-card-videos').classList.remove('active');
     renderVideos();
   });
 
