@@ -835,6 +835,82 @@
   @media (max-width: 520px) {
     #topbar .logo { font-size: 15px; }
   }
+
+  /* ── Welcome Banner ─────────────────────────────────────── */
+  #welcome-banner {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--blue);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+  }
+
+  .welcome-content {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  .welcome-icon {
+    font-size: 30px;
+    line-height: 1;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .welcome-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .welcome-heading {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .welcome-lead {
+    font-size: 13.5px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .welcome-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .welcome-features li {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.55;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .welcome-features li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--blue);
+    font-size: 12px;
+  }
+
+  @media (max-width: 520px) {
+    .welcome-icon { display: none; }
+    #welcome-banner { padding: 16px; }
+    .welcome-heading { font-size: 15px; }
+  }
 </style>
 </head>
 <body>
@@ -860,6 +936,25 @@
      MAIN
 ══════════════════════════════════════════ -->
 <main id="main">
+
+<!-- ══════════════════════════════════════════
+     WELCOME BANNER
+══════════════════════════════════════════ -->
+<aside id="welcome-banner" aria-label="About PPL Study">
+  <div class="welcome-content">
+    <div class="welcome-icon" aria-hidden="true">👩‍✈️</div>
+    <div class="welcome-body">
+      <h2 class="welcome-heading">Your Flight Training Desk Organizer</h2>
+      <p class="welcome-lead">Training for your Private Pilot License (PPL) means drowning in a sea of FAA handbooks, YouTube tutorials, web tools, and PDFs scattered across fifty browser tabs. This workspace is your central sandbox to corral the training chaos.</p>
+      <ul class="welcome-features">
+        <li><strong>Personal Knowledge Base</strong> — Drop in the specific videos, apps, and cockpit posters <em>you</em> actually use, instead of being locked into a rigid, commercial ground school ecosystem.</li>
+        <li><strong>Offline-First &amp; Local</strong> — Keep track of your study materials cleanly so you can reference your desktop setup anywhere.</li>
+        <li><strong>AI Ground Instructor</strong> — Plug in your own API key via the settings <span aria-label="gear icon">⚙️</span> to turn the <strong>Study Advisor</strong> into an on-demand CFII that instantly maps your training roadblocks to the exact chapters in the FAA Handbooks.</li>
+      </ul>
+    </div>
+    <button class="icon-btn" id="welcome-close" title="Dismiss" aria-label="Dismiss welcome banner">✕</button>
+  </div>
+</aside>
 
   <!-- ─── LIBRARY TAB ───────────────────────────────────── -->
   <section id="tab-library" class="tab-panel">
@@ -2195,6 +2290,15 @@ function saveTool() {
 
 function init() {
   loadState();
+
+  // Welcome banner
+  if (localStorage.getItem('ppl_welcome_dismissed')) {
+    document.getElementById('welcome-banner').hidden = true;
+  }
+  document.getElementById('welcome-close').addEventListener('click', () => {
+    document.getElementById('welcome-banner').hidden = true;
+    localStorage.setItem('ppl_welcome_dismissed', '1');
+  });
 
   // Hash routing
   const hash = location.hash.replace('#', '');
