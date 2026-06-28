@@ -724,13 +724,47 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Responsive ─────────────────────────────────────────── */
+  /* ── Tools card button row ──────────────────────────────── */
+  .card-btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  /* ── Nav label helpers ──────────────────────────────────── */
+  .nav-label-short { display: none; }
+  .nav-label-full  { display: inline; }
+
+  /* ── Responsive: phones (≤600px) ───────────────────────── */
+  @media (max-width: 600px) {
+    #topbar {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 8px 14px 0;
+      gap: 6px;
+    }
+    #topbar-actions { margin-left: auto; }
+    #nav {
+      order: 3;
+      margin-left: 0;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+      gap: 2px;
+    }
+    #nav::-webkit-scrollbar { display: none; }
+    .nav-label-full  { display: none; }
+    .nav-label-short { display: inline; }
+  }
+
   @media (max-width: 520px) {
     .advisor-layout { grid-template-columns: 1fr; }
     .topic-chips { flex-direction: row; flex-wrap: wrap; position: static; }
     .topic-chip { padding: 5px 10px; font-size: 12px; }
-    #nav .nav-btn { padding: 6px 10px; font-size: 13px; }
-    #topbar .logo { font-size: 14px; }
+    #topbar .logo { font-size: 15px; }
   }
 </style>
 </head>
@@ -742,9 +776,10 @@
 <header id="topbar">
   <div class="logo">PPL<span>Study</span></div>
   <nav id="nav">
-    <button class="nav-btn active" data-tab="advisor">Study Advisor</button>
+    <button class="nav-btn active" data-tab="advisor"><span class="nav-label-full">Study Advisor</span><span class="nav-label-short">Advisor</span></button>
     <button class="nav-btn" data-tab="library">Library</button>
     <button class="nav-btn" data-tab="videos">Videos</button>
+    <button class="nav-btn" data-tab="tools">Tools</button>
   </nav>
   <div id="topbar-actions">
     <button class="icon-btn" id="theme-toggle" title="Toggle day/night">☀️</button>
@@ -794,6 +829,26 @@
     <div class="cards-grid" id="videos-grid"></div>
   </section>
 
+  <!-- ─── TOOLS TAB ─────────────────────────────────────── -->
+  <section id="tab-tools" class="tab-panel">
+    <div class="videos-header">
+      <div>
+        <h1 class="section-heading">Study Tools</h1>
+        <p class="section-sub" style="margin-bottom:0">Apps, simulators, web tools, and posters for active study.</p>
+      </div>
+      <button class="btn btn-primary" id="add-tool-btn">+ Add a Tool</button>
+    </div>
+    <div class="filter-bar" id="tools-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="saved">My Saved</button>
+      <button class="filter-btn" data-filter="app">Apps</button>
+      <button class="filter-btn" data-filter="web">Web Tools</button>
+      <button class="filter-btn" data-filter="sim">Simulators</button>
+      <button class="filter-btn" data-filter="poster">Posters</button>
+    </div>
+    <div class="cards-grid" id="tools-grid"></div>
+  </section>
+
   <!-- ─── ADVISOR TAB ───────────────────────────────────── -->
   <section id="tab-advisor" class="tab-panel active">
     <h1 class="section-heading">Study Advisor</h1>
@@ -838,6 +893,45 @@
     <div class="modal-actions">
       <button class="btn btn-secondary" id="save-video-cancel">Cancel</button>
       <button class="btn btn-primary" id="save-video-save">Save Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ADD TOOL MODAL
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="add-tool-modal">
+  <div class="modal">
+    <button class="modal-close" id="add-tool-close">✕</button>
+    <h2>Add a Tool</h2>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="at-name" placeholder="Tool or app name">
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="at-type">
+        <option value="app">App</option>
+        <option value="web">Web Tool</option>
+        <option value="sim">Simulator</option>
+        <option value="poster">Poster</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>URL (optional)</label>
+      <input type="url" id="at-url" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label>What it is</label>
+      <textarea id="at-what" placeholder="Brief description of the tool..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Best for</label>
+      <input type="text" id="at-bestfor" placeholder="When or how to use it...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="add-tool-cancel">Cancel</button>
+      <button class="btn btn-primary" id="add-tool-save">Add Tool</button>
     </div>
   </div>
 </div>
@@ -1049,6 +1143,89 @@ const VIDEOS_SEED = [
   { id: 'v-8', title: 'VOR Navigation: Ace Your Private Pilot Written Test', channel: 'King Schools', videoId: 'RKksJLMmg2M', tags: [], saved: false },
 ];
 
+const TOOLS_SEED = [
+  {
+    id: 't-sportys',
+    name: "Sporty's Learn To Fly Course",
+    type: 'web',
+    tag: 'Ground School',
+    what: "Complete video ground school covering every written test topic, plus practice tests and progress tracking. One of the most popular courses for PPL students.",
+    bestFor: 'Systematic written test prep and structured ground school study.',
+    url: 'https://www.sportys.com/learn-to-fly-course.html',
+    saved: false,
+  },
+  {
+    id: 't-chairfly',
+    name: 'Chairfly',
+    type: 'app',
+    tag: 'Mental Rehearsal',
+    what: 'Mental rehearsal tool for pilots — practice procedures, traffic patterns, and maneuvers in your head with guided flows.',
+    bestFor: 'Pre-flight mental rehearsal, pattern practice, checklist flows, and bad-weather study days.',
+    url: '',
+    saved: false,
+  },
+  {
+    id: 't-chairfly-posters',
+    name: 'Chairfly Posters',
+    type: 'poster',
+    tag: 'Visual Reference',
+    what: 'Printed posters illustrating traffic patterns, maneuvers, and flight procedures — designed for wall reference while chairflying.',
+    bestFor: 'Desk or wall reference during ground study. Great for visualizing pattern entries and maneuver geometry.',
+    url: '',
+    saved: false,
+  },
+  {
+    id: 't-king',
+    name: 'King Schools',
+    type: 'web',
+    tag: 'Written Test Prep',
+    what: 'Video-based ground school and written test prep from John and Martha King. Known for thorough topic coverage and approachable teaching style.',
+    bestFor: 'Written test prep, especially if you prefer structured video-based lessons.',
+    url: 'https://www.kingschools.com',
+    saved: false,
+  },
+  {
+    id: 't-gleim',
+    name: 'Gleim Aviation',
+    type: 'web',
+    tag: 'Question Bank',
+    what: 'The largest FAA written test question bank available, with detailed explanations for every answer. Industry-standard tool for PPL knowledge test prep.',
+    bestFor: 'Drilling FAA knowledge test questions in the final weeks before your written exam.',
+    url: 'https://www.gleimaviation.com',
+    saved: false,
+  },
+  {
+    id: 't-foreflight',
+    name: 'ForeFlight',
+    type: 'app',
+    tag: 'Flight Planning',
+    what: 'The most widely used aviation app for iPad/iPhone — moving maps, weather briefings, flight planning, logbook, and plates all in one.',
+    bestFor: 'Pre-flight planning, in-flight moving map, and weather briefings for cross-countries.',
+    url: 'https://foreflight.com',
+    saved: false,
+  },
+  {
+    id: 't-msfs',
+    name: 'Microsoft Flight Simulator',
+    type: 'sim',
+    tag: 'Full Simulator',
+    what: 'The most realistic consumer flight simulator available. Excellent for procedure practice, airport familiarization, and building instrument scan habits.',
+    bestFor: 'Procedure practice, navigation drills, and productive study on days you cannot fly.',
+    url: 'https://www.flightsimulator.com',
+    saved: false,
+  },
+  {
+    id: 't-skyvector',
+    name: 'SkyVector',
+    type: 'web',
+    tag: 'Chart Practice',
+    what: 'Free web-based sectional chart viewer covering the entire US. Includes IFR charts, airport diagrams, NOTAMs, and basic flight planning tools.',
+    bestFor: 'Practicing sectional chart reading, airspace identification, and cross-country route planning.',
+    url: 'https://skyvector.com',
+    saved: false,
+  },
+];
+
 const TOPICS = [
   {
     name: 'Traffic Pattern & Landing',
@@ -1202,6 +1379,8 @@ const LLM_MODELS = {
   custom:    ['custom-model'],
 };
 
+const TOOL_TYPE_LABEL = { app: 'App', web: 'Web Tool', sim: 'Simulator', poster: 'Poster' };
+
 // ════════════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════════════
@@ -1211,14 +1390,19 @@ let libFilter = 'all';
 let libView = 'card'; // 'card' | 'list'
 let libSort = { col: 'name', dir: 1 }; // col: name|title|type|tag, dir: 1 asc / -1 desc
 let vidFilter = 'all';
+let toolFilter = 'all';
 let activeTopicIdx = null;
 let savedVideos = [];
+let savedTools = [];
 let llmSettings = { provider: 'anthropic', model: 'claude-sonnet-4-6', apiKey: '', endpoint: '' };
 let nightMode = false;
 
 function loadState() {
   const sv = localStorage.getItem('ppl_saved_videos');
   if (sv) savedVideos = JSON.parse(sv);
+
+  const st = localStorage.getItem('ppl_saved_tools');
+  if (st) savedTools = JSON.parse(st);
 
   const ls = localStorage.getItem('ppl_llm_settings');
   if (ls) llmSettings = { ...llmSettings, ...JSON.parse(ls) };
@@ -1234,6 +1418,10 @@ function loadState() {
 
 function saveVideosToStorage() {
   localStorage.setItem('ppl_saved_videos', JSON.stringify(savedVideos));
+}
+
+function saveToolsToStorage() {
+  localStorage.setItem('ppl_saved_tools', JSON.stringify(savedTools));
 }
 
 function saveLLMSettings() {
@@ -1416,6 +1604,61 @@ function deleteVideo(id) {
 }
 
 // ════════════════════════════════════════════════════════════
+// TOOLS RENDER
+// ════════════════════════════════════════════════════════════
+
+function renderTools() {
+  const grid = document.getElementById('tools-grid');
+  const allTools = [
+    ...TOOLS_SEED,
+    ...savedTools.map(t => ({ ...t, saved: true }))
+  ];
+
+  const filtered = allTools.filter(t => {
+    if (toolFilter === 'all') return true;
+    if (toolFilter === 'saved') return t.saved;
+    return t.type === toolFilter;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<p style="color:var(--text3); font-size:14px; grid-column:1/-1;">No tools match this filter.</p>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => {
+    const typeLabel = TOOL_TYPE_LABEL[t.type] || t.type;
+    const savedBadge = t.saved
+      ? `<span class="card-tag outline" style="border-color:var(--magenta);color:var(--magenta)">Saved</span>`
+      : '';
+    const linkBtn = t.url
+      ? `<a class="card-btn blue" href="${t.url}" target="_blank" rel="noopener">↗ Open</a>`
+      : '';
+    const deleteBtn = t.saved
+      ? `<button class="card-btn outline" onclick="deleteTool('${escHtml(t.id)}')">🗑 Remove</button>`
+      : '';
+    return `
+      <div class="card" id="tool-${escHtml(t.id)}">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="card-tag outline">${escHtml(typeLabel)}</span>
+          ${savedBadge}
+        </div>
+        <div class="card-title">${escHtml(t.name)}</div>
+        ${t.tag ? `<div class="card-subtitle">${escHtml(t.tag)}</div>` : ''}
+        <div class="card-body"><strong>What it is:</strong> ${escHtml(t.what)}</div>
+        <div class="card-body"><strong>Best for:</strong> ${escHtml(t.bestFor)}</div>
+        <div class="card-btn-row">${linkBtn}${deleteBtn}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteTool(id) {
+  savedTools = savedTools.filter(t => t.id !== id);
+  saveToolsToStorage();
+  renderTools();
+}
+
+// ════════════════════════════════════════════════════════════
 // ADVISOR RENDER
 // ════════════════════════════════════════════════════════════
 
@@ -1575,7 +1818,7 @@ Keep it concise and practical.`;
 }
 
 function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1674,6 +1917,46 @@ function saveVideo() {
 }
 
 // ════════════════════════════════════════════════════════════
+// ADD TOOL MODAL
+// ════════════════════════════════════════════════════════════
+
+function openAddToolModal() {
+  document.getElementById('at-name').value = '';
+  document.getElementById('at-type').value = 'app';
+  document.getElementById('at-url').value = '';
+  document.getElementById('at-what').value = '';
+  document.getElementById('at-bestfor').value = '';
+  document.getElementById('add-tool-modal').classList.add('open');
+}
+
+function closeAddToolModal() {
+  document.getElementById('add-tool-modal').classList.remove('open');
+}
+
+function saveTool() {
+  const name = document.getElementById('at-name').value.trim();
+  const type = document.getElementById('at-type').value;
+  const url = document.getElementById('at-url').value.trim();
+  const what = document.getElementById('at-what').value.trim();
+  const bestFor = document.getElementById('at-bestfor').value.trim();
+
+  if (!name) {
+    alert('Please enter a tool name.');
+    return;
+  }
+
+  const tool = {
+    id: 'ut-' + Date.now(),
+    name, type, tag: TOOL_TYPE_LABEL[type] || type, url, what, bestFor, saved: true,
+  };
+
+  savedTools.push(tool);
+  saveToolsToStorage();
+  closeAddToolModal();
+  renderTools();
+}
+
+// ════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════
 
@@ -1682,7 +1965,7 @@ function init() {
 
   // Hash routing
   const hash = location.hash.replace('#', '');
-  if (['library', 'videos', 'advisor'].includes(hash)) {
+  if (['library', 'videos', 'advisor', 'tools'].includes(hash)) {
     navigateTo(hash);
   } else {
     navigateTo('advisor');
@@ -1712,6 +1995,12 @@ function init() {
   document.getElementById('save-video-close').addEventListener('click', closeSaveVideoModal);
   document.getElementById('save-video-cancel').addEventListener('click', closeSaveVideoModal);
   document.getElementById('save-video-save').addEventListener('click', saveVideo);
+
+  // Add tool
+  document.getElementById('add-tool-btn').addEventListener('click', openAddToolModal);
+  document.getElementById('add-tool-close').addEventListener('click', closeAddToolModal);
+  document.getElementById('add-tool-cancel').addEventListener('click', closeAddToolModal);
+  document.getElementById('add-tool-save').addEventListener('click', saveTool);
 
   // Close modals on backdrop click
   document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
@@ -1754,9 +2043,20 @@ function init() {
     renderVideos();
   });
 
+  // Tools filters
+  document.getElementById('tools-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    toolFilter = btn.dataset.filter;
+    document.querySelectorAll('#tools-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTools();
+  });
+
   // Initial renders
   renderLibrary();
   renderVideos();
+  renderTools();
   renderTopicChips();
 }
 
