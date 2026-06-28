@@ -1237,6 +1237,52 @@
 </div>
 
 <!-- ══════════════════════════════════════════
+     ABOUT MODAL
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="about-modal">
+  <div class="modal" style="max-width:600px">
+    <button class="modal-close" id="about-modal-close">✕</button>
+    <h2>Your Flight Training Desk Organizer</h2>
+    <p style="font-size:13.5px;color:var(--text2);line-height:1.6;margin-bottom:16px">Training for your Private Pilot License (PPL) means drowning in a sea of FAA handbooks, YouTube tutorials, web tools, and PDFs scattered across fifty browser tabs. This workspace is your central sandbox to corral the training chaos.</p>
+    <ul style="list-style:none;padding:0;margin:0 0 20px;display:flex;flex-direction:column;gap:8px">
+      <li style="font-size:13px;color:var(--text2);line-height:1.55;padding-left:18px;position:relative"><span style="position:absolute;left:0;color:var(--blue)">▸</span><strong>Personal Knowledge Base</strong> — Drop in the specific videos, apps, and cockpit posters <em>you</em> actually use, instead of being locked into a rigid, commercial ground school ecosystem.</li>
+      <li style="font-size:13px;color:var(--text2);line-height:1.55;padding-left:18px;position:relative"><span style="position:absolute;left:0;color:var(--blue)">▸</span><strong>Offline-First &amp; Local</strong> — Keep track of your study materials cleanly so you can reference your desktop setup anywhere.</li>
+      <li style="font-size:13px;color:var(--text2);line-height:1.55;padding-left:18px;position:relative"><span style="position:absolute;left:0;color:var(--blue)">▸</span><strong>AI Ground Instructor</strong> — Plug in your own API key via the settings ⚙️ to turn the <strong>Study Advisor</strong> into an on-demand CFII that instantly maps your training roadblocks to the exact chapters in the FAA Handbooks.</li>
+    </ul>
+    <div class="welcome-tabs" role="list">
+      <button class="welcome-tab-card" data-tab="advisor" id="about-modal-advisor" role="listitem">
+        <span class="welcome-tab-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" fill="currentColor" stroke="currentColor" stroke-linejoin="round"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg>
+        </span>
+        <span class="welcome-tab-name">Study Advisor</span>
+        <span class="welcome-tab-desc">Pick a topic and get chapter-level reading recommendations from the FAA handbooks.</span>
+      </button>
+      <button class="welcome-tab-card" data-tab="library" id="about-modal-library" role="listitem">
+        <span class="welcome-tab-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>
+        </span>
+        <span class="welcome-tab-name">Library</span>
+        <span class="welcome-tab-desc">Browse the 6 essential FAA documents and 6 recommended books for your PPL.</span>
+      </button>
+      <button class="welcome-tab-card" data-tab="videos" id="about-modal-videos" role="listitem">
+        <span class="welcome-tab-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2" ry="2"/><path d="M10 9.5 L16 12 L10 14.5 Z" fill="currentColor" stroke="none"/></svg>
+        </span>
+        <span class="welcome-tab-name">Videos</span>
+        <span class="welcome-tab-desc">Curated YouTube videos plus your own saved links, filtered by topic.</span>
+      </button>
+      <button class="welcome-tab-card" data-tab="tools" id="about-modal-tools" role="listitem">
+        <span class="welcome-tab-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </span>
+        <span class="welcome-tab-name">Tools</span>
+        <span class="welcome-tab-desc">Apps, simulators, web tools, and cockpit posters — seed list plus your own additions.</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
      SETTINGS MODAL
 ══════════════════════════════════════════ -->
 <div class="modal-backdrop" id="settings-modal">
@@ -2418,12 +2464,22 @@ function init() {
     applyTheme();
   });
 
-  // About (re-show welcome banner)
+  // About button — open modal if banner already dismissed, else scroll to banner
   document.getElementById('about-btn').addEventListener('click', () => {
-    const banner = document.getElementById('welcome-banner');
-    banner.hidden = false;
-    localStorage.removeItem('ppl_welcome_dismissed');
-    banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (localStorage.getItem('ppl_welcome_dismissed')) {
+      document.getElementById('about-modal').classList.add('open');
+    } else {
+      document.getElementById('welcome-banner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+  document.getElementById('about-modal-close').addEventListener('click', () => {
+    document.getElementById('about-modal').classList.remove('open');
+  });
+  ['advisor','library','videos','tools'].forEach(tab => {
+    document.getElementById('about-modal-' + tab).addEventListener('click', () => {
+      document.getElementById('about-modal').classList.remove('open');
+      navigateTo(tab);
+    });
   });
 
   // Settings
