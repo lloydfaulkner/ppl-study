@@ -838,13 +838,19 @@
       </div>
       <button class="btn btn-primary" id="add-tool-btn">+ Add a Tool</button>
     </div>
-    <div class="filter-bar" id="tools-filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="saved">My Saved</button>
-      <button class="filter-btn" data-filter="app">Apps</button>
-      <button class="filter-btn" data-filter="web">Web Tools</button>
-      <button class="filter-btn" data-filter="sim">Simulators</button>
-      <button class="filter-btn" data-filter="poster">Posters</button>
+    <div class="lib-toolbar">
+      <div class="filter-bar" id="tools-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="saved">My Saved</button>
+        <button class="filter-btn" data-filter="app">Apps</button>
+        <button class="filter-btn" data-filter="web">Web Tools</button>
+        <button class="filter-btn" data-filter="sim">Simulators</button>
+        <button class="filter-btn" data-filter="poster">Posters</button>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-card-tools" title="Card view">⊞</button>
+        <button class="view-btn" id="view-list-tools" title="List view">☰</button>
+      </div>
     </div>
     <div class="cards-grid" id="tools-grid"></div>
   </section>
@@ -1391,6 +1397,7 @@ let libView = 'card'; // 'card' | 'list'
 let libSort = { col: 'name', dir: 1 }; // col: name|title|type|tag, dir: 1 asc / -1 desc
 let vidFilter = 'all';
 let toolFilter = 'all';
+let toolView = 'card';
 let activeTopicIdx = null;
 let savedVideos = [];
 let savedTools = [];
@@ -1621,35 +1628,73 @@ function renderTools() {
   });
 
   if (filtered.length === 0) {
+    grid.style.display = '';
     grid.innerHTML = `<p style="color:var(--text3); font-size:14px; grid-column:1/-1;">No tools match this filter.</p>`;
     return;
   }
 
-  grid.innerHTML = filtered.map(t => {
-    const typeLabel = TOOL_TYPE_LABEL[t.type] || t.type;
-    const savedBadge = t.saved
-      ? `<span class="card-tag outline" style="border-color:var(--magenta);color:var(--magenta)">Saved</span>`
-      : '';
-    const linkBtn = t.url
-      ? `<a class="card-btn blue" href="${t.url}" target="_blank" rel="noopener">↗ Open</a>`
-      : '';
-    const deleteBtn = t.saved
-      ? `<button class="card-btn outline" onclick="deleteTool('${escHtml(t.id)}')">🗑 Remove</button>`
-      : '';
-    return `
-      <div class="card" id="tool-${escHtml(t.id)}">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span class="card-tag outline">${escHtml(typeLabel)}</span>
-          ${savedBadge}
-        </div>
-        <div class="card-title">${escHtml(t.name)}</div>
-        ${t.tag ? `<div class="card-subtitle">${escHtml(t.tag)}</div>` : ''}
-        <div class="card-body"><strong>What it is:</strong> ${escHtml(t.what)}</div>
-        <div class="card-body"><strong>Best for:</strong> ${escHtml(t.bestFor)}</div>
-        <div class="card-btn-row">${linkBtn}${deleteBtn}</div>
-      </div>
+  if (toolView === 'list') {
+    grid.style.display = 'block';
+    grid.innerHTML = `
+      <table class="lib-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(t => {
+            const typeLabel = TOOL_TYPE_LABEL[t.type] || t.type;
+            const savedMark = t.saved ? ' <span style="font-size:10px;font-weight:600;color:var(--magenta)">[Saved]</span>' : '';
+            const linkBtn = t.url
+              ? `<a class="card-btn blue" href="${t.url}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px;margin-top:0">↗ Open</a>`
+              : '';
+            const deleteBtn = t.saved
+              ? `<button class="card-btn outline" onclick="deleteTool('${escHtml(t.id)}')" style="font-size:12px;padding:5px 10px;margin-top:0">🗑</button>`
+              : '';
+            return `
+              <tr id="tool-${escHtml(t.id)}">
+                <td class="col-name">${escHtml(t.name)}${savedMark}<span class="col-name-sub">${escHtml(t.bestFor)}</span></td>
+                <td class="col-title">${t.tag ? escHtml(t.tag) : '—'}</td>
+                <td><span class="card-tag outline" style="font-size:10px">${escHtml(typeLabel)}</span></td>
+                <td class="col-link" style="display:flex;gap:6px;justify-content:flex-end">${linkBtn}${deleteBtn}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
     `;
-  }).join('');
+  } else {
+    grid.style.display = '';
+    grid.innerHTML = filtered.map(t => {
+      const typeLabel = TOOL_TYPE_LABEL[t.type] || t.type;
+      const savedBadge = t.saved
+        ? `<span class="card-tag outline" style="border-color:var(--magenta);color:var(--magenta)">Saved</span>`
+        : '';
+      const linkBtn = t.url
+        ? `<a class="card-btn blue" href="${t.url}" target="_blank" rel="noopener">↗ Open</a>`
+        : '';
+      const deleteBtn = t.saved
+        ? `<button class="card-btn outline" onclick="deleteTool('${escHtml(t.id)}')">🗑 Remove</button>`
+        : '';
+      return `
+        <div class="card" id="tool-${escHtml(t.id)}">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="card-tag outline">${escHtml(typeLabel)}</span>
+            ${savedBadge}
+          </div>
+          <div class="card-title">${escHtml(t.name)}</div>
+          ${t.tag ? `<div class="card-subtitle">${escHtml(t.tag)}</div>` : ''}
+          <div class="card-body"><strong>What it is:</strong> ${escHtml(t.what)}</div>
+          <div class="card-body"><strong>Best for:</strong> ${escHtml(t.bestFor)}</div>
+          <div class="card-btn-row">${linkBtn}${deleteBtn}</div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 function deleteTool(id) {
@@ -2041,6 +2086,20 @@ function init() {
     document.querySelectorAll('#vid-filters .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderVideos();
+  });
+
+  // Tools view toggle
+  document.getElementById('view-card-tools').addEventListener('click', () => {
+    toolView = 'card';
+    document.getElementById('view-card-tools').classList.add('active');
+    document.getElementById('view-list-tools').classList.remove('active');
+    renderTools();
+  });
+  document.getElementById('view-list-tools').addEventListener('click', () => {
+    toolView = 'list';
+    document.getElementById('view-list-tools').classList.add('active');
+    document.getElementById('view-card-tools').classList.remove('active');
+    renderTools();
   });
 
   // Tools filters
