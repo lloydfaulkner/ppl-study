@@ -1690,7 +1690,7 @@ function renderTools() {
             const typeLabel = TOOL_TYPE_LABEL[t.type] || t.type;
             const savedMark = t.saved ? ' <span style="font-size:10px;font-weight:600;color:var(--magenta)">[Saved]</span>' : '';
             const linkBtn = t.url
-              ? `<a class="card-btn blue" href="${t.url}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px;margin-top:0">↗ Open</a>`
+              ? `<a class="card-btn blue" href="${t.url}" target="_blank" rel="noopener" style="font-size:12px;padding:5px 10px;margin-top:0">Open</a>`
               : '';
             const deleteBtn = t.saved
               ? `<button class="card-btn outline" onclick="deleteTool('${escHtml(t.id)}')" style="font-size:12px;padding:5px 10px;margin-top:0">🗑</button>`
@@ -1714,9 +1714,9 @@ function renderTools() {
       const savedBadge = t.saved
         ? `<span class="card-tag outline" style="border-color:var(--magenta);color:var(--magenta)">Saved</span>`
         : '';
-      const linkBtn = t.url
-        ? `<a class="card-btn blue" href="${t.url}" target="_blank" rel="noopener">↗ Open</a>`
-        : '';
+      const titleEl = t.url
+        ? `<a class="card-title" href="${t.url}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--text)">${escHtml(t.name)} <span style="font-size:13px;color:var(--blue);font-weight:400">→</span></a>`
+        : `<div class="card-title">${escHtml(t.name)}</div>`;
       const deleteBtn = t.saved
         ? `<button class="card-btn outline" onclick="deleteTool('${escHtml(t.id)}')">🗑 Remove</button>`
         : '';
@@ -1726,11 +1726,11 @@ function renderTools() {
             <span class="card-tag outline">${escHtml(typeLabel)}</span>
             ${savedBadge}
           </div>
-          <div class="card-title">${escHtml(t.name)}</div>
+          ${titleEl}
           ${t.tag ? `<div class="card-subtitle">${escHtml(t.tag)}</div>` : ''}
           <div class="card-body"><strong>What it is:</strong> ${escHtml(t.what)}</div>
           <div class="card-body"><strong>Best for:</strong> ${escHtml(t.bestFor)}</div>
-          <div class="card-btn-row">${linkBtn}${deleteBtn}</div>
+          ${deleteBtn ? `<div class="card-btn-row">${deleteBtn}</div>` : ''}
         </div>
       `;
     }).join('');
