@@ -660,9 +660,9 @@
 <header id="topbar">
   <div class="logo">PPL<span>Study</span></div>
   <nav id="nav">
-    <button class="nav-btn active" data-tab="library">Library</button>
+    <button class="nav-btn active" data-tab="advisor">Study Advisor</button>
+    <button class="nav-btn" data-tab="library">Library</button>
     <button class="nav-btn" data-tab="videos">Videos</button>
-    <button class="nav-btn" data-tab="advisor">Study Advisor</button>
   </nav>
   <div id="topbar-actions">
     <button class="icon-btn" id="theme-toggle" title="Toggle day/night">☀️</button>
@@ -676,7 +676,7 @@
 <main id="main">
 
   <!-- ─── LIBRARY TAB ───────────────────────────────────── -->
-  <section id="tab-library" class="tab-panel active">
+  <section id="tab-library" class="tab-panel">
     <h1 class="section-heading">Resource Library</h1>
     <p class="section-sub">Essential FAA documents and recommended books for your PPL journey.</p>
     <div class="filter-bar" id="lib-filters">
@@ -707,7 +707,7 @@
   </section>
 
   <!-- ─── ADVISOR TAB ───────────────────────────────────── -->
-  <section id="tab-advisor" class="tab-panel">
+  <section id="tab-advisor" class="tab-panel active">
     <h1 class="section-heading">Study Advisor</h1>
     <p class="section-sub">Pick a topic to see targeted reading recommendations.</p>
     <div class="advisor-layout">
@@ -1086,6 +1086,42 @@ const TOPICS = [
       { source: 'AFH', detail: 'Chapter 10', note: 'Night flight procedures and techniques' },
       { source: 'FAR', detail: 'Part 91.209', note: 'Aircraft lighting requirements for night' },
       { source: 'AIM', detail: 'Chapter 2', note: 'Aeronautical lighting and airport beacons' },
+    ]
+  },
+  {
+    name: 'Engine & Propeller',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 7', note: 'Reciprocating engines, carb heat, mixture, magnetos' },
+      { source: 'AFH', detail: 'Chapter 2', note: 'Engine management during pre-flight and flight' },
+      { source: 'FAR', detail: 'Part 91.409', note: 'Inspection requirements and engine logbooks' },
+      { source: 'ACS', detail: 'Section I', note: 'Engine knowledge tested in oral exam' },
+    ]
+  },
+  {
+    name: 'Fuel System',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 7', note: 'Fuel grades, sumping, fuel injection vs. carburetor' },
+      { source: 'AFH', detail: 'Chapter 2', note: 'Fuel system pre-flight checks and management' },
+      { source: 'FAR', detail: 'Part 91.151', note: 'VFR fuel reserve requirements' },
+      { source: 'ACS', detail: 'Section I', note: 'Fuel system knowledge for checkride oral' },
+    ]
+  },
+  {
+    name: 'Electrical System',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 7', note: 'Alternator, battery, bus bar, circuit breakers' },
+      { source: 'AFH', detail: 'Chapter 2', note: 'Electrical pre-flight and in-flight procedures' },
+      { source: 'AFH', detail: 'Chapter 17', note: 'Electrical failure emergency procedures' },
+      { source: 'ACS', detail: 'Section IX', note: 'Electrical emergency handling on checkride' },
+    ]
+  },
+  {
+    name: 'Pitot-Static System',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 8', note: 'Airspeed indicator, altimeter, VSI — how they work and fail' },
+      { source: 'AFH', detail: 'Chapter 3', note: 'Recognizing and managing instrument errors' },
+      { source: 'FAR', detail: 'Part 91.411', note: 'Altimeter and pitot-static system test requirements' },
+      { source: 'ACS', detail: 'Section II', note: 'Pitot-static knowledge tested in oral' },
     ]
   },
 ];
@@ -1527,7 +1563,7 @@ function init() {
   if (['library', 'videos', 'advisor'].includes(hash)) {
     navigateTo(hash);
   } else {
-    navigateTo('library');
+    navigateTo('advisor');
   }
 
   // Nav
