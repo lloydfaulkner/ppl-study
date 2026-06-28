@@ -381,14 +381,33 @@
   }
   @media (max-width: 680px) {
     .advisor-layout { grid-template-columns: 1fr; }
+    .topic-chips { position: static; }
   }
 
   .topic-chips {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0;
     position: sticky;
     top: 74px;
+  }
+  .topic-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 14px;
+  }
+  .topic-group:first-child { margin-top: 0; }
+  .topic-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+    user-select: none;
   }
   .topic-chip {
     background: var(--card-bg);
@@ -781,8 +800,11 @@
 
   @media (max-width: 520px) {
     .advisor-layout { grid-template-columns: 1fr; }
-    .topic-chips { flex-direction: row; flex-wrap: wrap; position: static; }
-    .topic-chip { padding: 5px 10px; font-size: 12px; }
+    .topic-chips { position: static; }
+    .topic-group { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; }
+    .topic-group:first-child { margin-top: 0; }
+    .topic-group-label { grid-column: 1 / -1; }
+    .topic-chip { padding: 8px 10px; font-size: 12.5px; text-align: center; }
     #topbar .logo { font-size: 15px; }
   }
 </style>
@@ -1313,7 +1335,9 @@ const ACS_PDF = 'https://www.faa.gov/training_testing/testing/acs/private_airpla
 const WX_PDF  = 'https://www.faa.gov/sites/faa.gov/files/FAA-H-8083-28_FAA_Web.pdf';
 
 const TOPICS = [
+  // ── Maneuvers ──────────────────────────────────────────────
   {
+    group: 'Maneuvers',
     name: 'Traffic Pattern & Landing',
     recs: [
       { source: 'AFH', detail: 'Chapter 5 & 9', note: 'Traffic pattern procedures, approach, flare, touchdown', url: AFH + '10_afh_ch9.pdf' },
@@ -1323,6 +1347,7 @@ const TOPICS = [
     ]
   },
   {
+    group: 'Maneuvers',
     name: 'Stalls & Slow Flight',
     recs: [
       { source: 'AFH', detail: 'Chapter 4', note: 'Stall recognition, recovery, and slow flight', url: AFH + '05_afh_ch4.pdf' },
@@ -1332,51 +1357,7 @@ const TOPICS = [
     ]
   },
   {
-    name: 'Radio Communications',
-    recs: [
-      { source: 'AIM', detail: 'Chapter 4', note: 'Phraseology, ATC services, readbacks', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap4.html' },
-      { source: 'Say Again', detail: 'Whole book', note: 'The definitive radio communications guide' },
-      { source: 'PHAK', detail: 'Chapter 15', note: 'Communication systems and procedures', url: PHAK + '17_phak_ch15.pdf' },
-      { source: 'ACS', detail: 'Section III', note: 'Radio communication checkride requirements', url: ACS_PDF },
-    ]
-  },
-  {
-    name: 'Weather & Go/No-Go',
-    recs: [
-      { source: 'PHAK', detail: 'Ch. 11–12', note: 'Weather theory, clouds, fronts, hazards', url: PHAK + '14_phak_ch12.pdf' },
-      { source: 'Wx Handbook', detail: 'Ch. 1–4, 10–13', note: 'Comprehensive meteorology and weather products', url: WX_PDF },
-      { source: 'AIM', detail: 'Chapter 7', note: 'Safety of flight, weather services, PIREPs', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap7.html' },
-      { source: 'Weather Flying', detail: 'Whole book', note: 'Practical go/no-go decision making' },
-    ]
-  },
-  {
-    name: 'Navigation & Cross-Country',
-    recs: [
-      { source: 'PHAK', detail: 'Ch. 16', note: 'Navigation, sectional charts, pilotage, dead reckoning', url: PHAK + '18_phak_ch16.pdf' },
-      { source: 'AFH', detail: 'Chapter 16', note: 'Cross-country flight planning and execution', url: AFH + '17_afh_ch16.pdf' },
-      { source: 'AIM', detail: 'Ch. 5', note: 'Procedures for cross-country, ADIZ, VFR flight plans', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap5.html' },
-      { source: 'ACS', detail: 'Section IX', note: 'Navigation checkride standards', url: ACS_PDF },
-    ]
-  },
-  {
-    name: 'Airspace',
-    recs: [
-      { source: 'PHAK', detail: 'Chapter 14', note: 'All airspace classes, dimensions, requirements', url: PHAK + '16_phak_ch14.pdf' },
-      { source: 'AIM', detail: 'Chapter 3', note: 'Detailed airspace descriptions and procedures', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap3.html' },
-      { source: 'FAR', detail: 'Part 91.117–91.135', note: 'Airspace operating rules, speed limits', url: 'https://www.ecfr.gov/current/title-14/part-91/section-91.117' },
-      { source: 'ACS', detail: 'Section II', note: 'Airspace knowledge checkride requirements', url: ACS_PDF },
-    ]
-  },
-  {
-    name: 'Regulations (FAR)',
-    recs: [
-      { source: 'FAR', detail: 'Part 61', note: 'Pilot certification requirements and privileges', url: 'https://www.ecfr.gov/current/title-14/part-61' },
-      { source: 'FAR', detail: 'Part 91', note: 'General operating and flight rules', url: 'https://www.ecfr.gov/current/title-14/part-91' },
-      { source: 'PHAK', detail: 'Chapter 1', note: 'Overview of the regulatory framework', url: PHAK + '03_phak_ch1.pdf' },
-      { source: 'ACS', detail: 'Section I', note: 'Regulations tested on the checkride', url: ACS_PDF },
-    ]
-  },
-  {
+    group: 'Maneuvers',
     name: 'Emergency Procedures',
     recs: [
       { source: 'AFH', detail: 'Chapter 17', note: 'Engine failures, emergency landings, fires', url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook' },
@@ -1386,33 +1367,59 @@ const TOPICS = [
     ]
   },
   {
-    name: 'Weight & Balance',
+    group: 'Maneuvers',
+    name: 'Night Flying',
     recs: [
-      { source: 'PHAK', detail: 'Chapter 9', note: 'Weight and balance theory, CG calculations', url: PHAK + '11_phak_ch9.pdf' },
-      { source: 'AFH', detail: 'Chapter 2', note: 'Pre-flight planning including W&B', url: AFH + '03_afh_ch2.pdf' },
-      { source: 'FAR', detail: 'Part 91.9', note: 'Operating limitations, max gross weight', url: 'https://www.ecfr.gov/current/title-14/part-91/section-91.9' },
-      { source: 'ACS', detail: 'Section I', note: 'W&B checkride knowledge requirements', url: ACS_PDF },
+      { source: 'PHAK', detail: 'Chapter 17', note: 'Night vision physiology, lighting, illusions', url: PHAK + '19_phak_ch17.pdf' },
+      { source: 'AFH', detail: 'Chapter 10', note: 'Night flight procedures and techniques', url: AFH + '11_afh_ch10.pdf' },
+      { source: 'FAR', detail: 'Part 91.209', note: 'Aircraft lighting requirements for night', url: 'https://www.ecfr.gov/current/title-14/part-91/section-91.209' },
+      { source: 'AIM', detail: 'Chapter 2', note: 'Aeronautical lighting and airport beacons', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap2.html' },
+    ]
+  },
+  // ── Nav & Weather ──────────────────────────────────────────
+  {
+    group: 'Nav & Weather',
+    name: 'Weather & Go/No-Go',
+    recs: [
+      { source: 'PHAK', detail: 'Ch. 11–12', note: 'Weather theory, clouds, fronts, hazards', url: PHAK + '14_phak_ch12.pdf' },
+      { source: 'Wx Handbook', detail: 'Ch. 1–4, 10–13', note: 'Comprehensive meteorology and weather products', url: WX_PDF },
+      { source: 'AIM', detail: 'Chapter 7', note: 'Safety of flight, weather services, PIREPs', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap7.html' },
+      { source: 'Weather Flying', detail: 'Whole book', note: 'Practical go/no-go decision making' },
     ]
   },
   {
-    name: 'Aircraft Performance',
+    group: 'Nav & Weather',
+    name: 'Navigation & Cross-Country',
     recs: [
-      { source: 'PHAK', detail: 'Chapter 10', note: 'Performance charts, density altitude, POH usage', url: PHAK + '12_phak_ch10.pdf' },
-      { source: 'AFH', detail: 'Chapter 2', note: 'Using the Pilot Operating Handbook', url: AFH + '03_afh_ch2.pdf' },
-      { source: 'PHAK', detail: 'Chapter 4', note: 'How aerodynamics affect performance', url: PHAK + '06_phak_ch4.pdf' },
-      { source: 'ACS', detail: 'Section I', note: 'Performance planning checkride requirements', url: ACS_PDF },
+      { source: 'PHAK', detail: 'Ch. 16', note: 'Navigation, sectional charts, pilotage, dead reckoning', url: PHAK + '18_phak_ch16.pdf' },
+      { source: 'AFH', detail: 'Chapter 16', note: 'Cross-country flight planning and execution', url: AFH + '17_afh_ch16.pdf' },
+      { source: 'AIM', detail: 'Ch. 5', note: 'Procedures for cross-country, ADIZ, VFR flight plans', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap5.html' },
+      { source: 'ACS', detail: 'Section IX', note: 'Navigation checkride standards', url: ACS_PDF },
     ]
   },
   {
-    name: 'Flight Instruments',
+    group: 'Nav & Weather',
+    name: 'Radio Communications',
     recs: [
-      { source: 'PHAK', detail: 'Chapter 8', note: 'Pitot-static, gyroscopic, and magnetic instruments', url: PHAK + '10_phak_ch8.pdf' },
-      { source: 'AFH', detail: 'Chapter 3', note: 'Instrument scan during basic maneuvers', url: AFH + '04_afh_ch3.pdf' },
-      { source: 'PHAK', detail: 'Chapter 7', note: 'Aircraft systems including avionics', url: PHAK + '09_phak_ch7.pdf' },
-      { source: 'ACS', detail: 'Section II', note: 'Instrument knowledge for the checkride', url: ACS_PDF },
+      { source: 'AIM', detail: 'Chapter 4', note: 'Phraseology, ATC services, readbacks', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap4.html' },
+      { source: 'Say Again', detail: 'Whole book', note: 'The definitive radio communications guide' },
+      { source: 'PHAK', detail: 'Chapter 15', note: 'Communication systems and procedures', url: PHAK + '17_phak_ch15.pdf' },
+      { source: 'ACS', detail: 'Section III', note: 'Radio communication checkride requirements', url: ACS_PDF },
     ]
   },
   {
+    group: 'Nav & Weather',
+    name: 'Airspace',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 14', note: 'All airspace classes, dimensions, requirements', url: PHAK + '16_phak_ch14.pdf' },
+      { source: 'AIM', detail: 'Chapter 3', note: 'Detailed airspace descriptions and procedures', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap3.html' },
+      { source: 'FAR', detail: 'Part 91.117–91.135', note: 'Airspace operating rules, speed limits', url: 'https://www.ecfr.gov/current/title-14/part-91/section-91.117' },
+      { source: 'ACS', detail: 'Section II', note: 'Airspace knowledge checkride requirements', url: ACS_PDF },
+    ]
+  },
+  // ── Aircraft ───────────────────────────────────────────────
+  {
+    group: 'Aircraft',
     name: 'Aerodynamics',
     recs: [
       { source: 'PHAK', detail: 'Chapter 4', note: 'Lift, drag, thrust, four forces of flight', url: PHAK + '06_phak_ch4.pdf' },
@@ -1422,30 +1429,64 @@ const TOPICS = [
     ]
   },
   {
-    name: 'Checkride Prep',
-    recs: [
-      { source: 'ACS', detail: 'Whole document', note: 'Read cover-to-cover — this IS the checkride rubric', url: ACS_PDF },
-      { source: 'AFH', detail: 'Review all', note: 'Maneuver standards directly from ACS', url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook' },
-      { source: 'FAR', detail: 'Parts 61 & 91', note: 'Regulations commonly tested on oral', url: 'https://www.ecfr.gov/current/title-14/part-61' },
-      { source: 'Rod Machado', detail: 'Full book', note: 'Best written test prep available' },
-    ]
-  },
-  {
-    name: 'Night Flying',
-    recs: [
-      { source: 'PHAK', detail: 'Chapter 17', note: 'Night vision physiology, lighting, illusions', url: PHAK + '19_phak_ch17.pdf' },
-      { source: 'AFH', detail: 'Chapter 10', note: 'Night flight procedures and techniques', url: AFH + '11_afh_ch10.pdf' },
-      { source: 'FAR', detail: 'Part 91.209', note: 'Aircraft lighting requirements for night', url: 'https://www.ecfr.gov/current/title-14/part-91/section-91.209' },
-      { source: 'AIM', detail: 'Chapter 2', note: 'Aeronautical lighting and airport beacons', url: 'https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap2.html' },
-    ]
-  },
-  {
+    group: 'Aircraft',
     name: 'Aircraft Systems',
     recs: [
       { source: 'PHAK', detail: 'Chapter 7', note: 'Engine, fuel, electrical, hydraulics, pitot-static — all systems in one chapter', url: PHAK + '09_phak_ch7.pdf' },
       { source: 'PHAK', detail: 'Chapter 8', note: 'Flight instruments: how the pitot-static and gyro instruments work and fail', url: PHAK + '10_phak_ch8.pdf' },
       { source: 'AFH', detail: 'Chapter 2', note: 'Pre-flight system checks and in-flight management', url: AFH + '03_afh_ch2.pdf' },
       { source: 'FAR', detail: 'Parts 91.151, 91.409, 91.411', note: 'Fuel reserves, inspection intervals, altimeter/pitot-static test reqs', url: 'https://www.ecfr.gov/current/title-14/part-91/section-91.151' },
+    ]
+  },
+  {
+    group: 'Aircraft',
+    name: 'Flight Instruments',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 8', note: 'Pitot-static, gyroscopic, and magnetic instruments', url: PHAK + '10_phak_ch8.pdf' },
+      { source: 'AFH', detail: 'Chapter 3', note: 'Instrument scan during basic maneuvers', url: AFH + '04_afh_ch3.pdf' },
+      { source: 'PHAK', detail: 'Chapter 7', note: 'Aircraft systems including avionics', url: PHAK + '09_phak_ch7.pdf' },
+      { source: 'ACS', detail: 'Section II', note: 'Instrument knowledge for the checkride', url: ACS_PDF },
+    ]
+  },
+  {
+    group: 'Aircraft',
+    name: 'Weight & Balance',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 9', note: 'Weight and balance theory, CG calculations', url: PHAK + '11_phak_ch9.pdf' },
+      { source: 'AFH', detail: 'Chapter 2', note: 'Pre-flight planning including W&B', url: AFH + '03_afh_ch2.pdf' },
+      { source: 'FAR', detail: 'Part 91.9', note: 'Operating limitations, max gross weight', url: 'https://www.ecfr.gov/current/title-14/part-91/section-91.9' },
+      { source: 'ACS', detail: 'Section I', note: 'W&B checkride knowledge requirements', url: ACS_PDF },
+    ]
+  },
+  {
+    group: 'Aircraft',
+    name: 'Aircraft Performance',
+    recs: [
+      { source: 'PHAK', detail: 'Chapter 10', note: 'Performance charts, density altitude, POH usage', url: PHAK + '12_phak_ch10.pdf' },
+      { source: 'AFH', detail: 'Chapter 2', note: 'Using the Pilot Operating Handbook', url: AFH + '03_afh_ch2.pdf' },
+      { source: 'PHAK', detail: 'Chapter 4', note: 'How aerodynamics affect performance', url: PHAK + '06_phak_ch4.pdf' },
+      { source: 'ACS', detail: 'Section I', note: 'Performance planning checkride requirements', url: ACS_PDF },
+    ]
+  },
+  // ── Rules & Exam ───────────────────────────────────────────
+  {
+    group: 'Rules & Exam',
+    name: 'Regulations (FAR)',
+    recs: [
+      { source: 'FAR', detail: 'Part 61', note: 'Pilot certification requirements and privileges', url: 'https://www.ecfr.gov/current/title-14/part-61' },
+      { source: 'FAR', detail: 'Part 91', note: 'General operating and flight rules', url: 'https://www.ecfr.gov/current/title-14/part-91' },
+      { source: 'PHAK', detail: 'Chapter 1', note: 'Overview of the regulatory framework', url: PHAK + '03_phak_ch1.pdf' },
+      { source: 'ACS', detail: 'Section I', note: 'Regulations tested on the checkride', url: ACS_PDF },
+    ]
+  },
+  {
+    group: 'Rules & Exam',
+    name: 'Checkride Prep',
+    recs: [
+      { source: 'ACS', detail: 'Whole document', note: 'Read cover-to-cover — this IS the checkride rubric', url: ACS_PDF },
+      { source: 'AFH', detail: 'Review all', note: 'Maneuver standards directly from ACS', url: 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook' },
+      { source: 'FAR', detail: 'Parts 61 & 91', note: 'Regulations commonly tested on oral', url: 'https://www.ecfr.gov/current/title-14/part-61' },
+      { source: 'Rod Machado', detail: 'Full book', note: 'Best written test prep available' },
     ]
   },
 ];
@@ -1790,9 +1831,20 @@ function deleteTool(id) {
 
 function renderTopicChips() {
   const container = document.getElementById('topic-chips');
-  container.innerHTML = TOPICS.map((t, i) =>
-    `<button class="topic-chip ${activeTopicIdx === i ? 'active' : ''}" onclick="selectTopic(${i})">${t.name}</button>`
-  ).join('');
+  const groups = {};
+  const groupOrder = [];
+  TOPICS.forEach((t, i) => {
+    if (!groups[t.group]) { groups[t.group] = []; groupOrder.push(t.group); }
+    groups[t.group].push({ t, i });
+  });
+  container.innerHTML = groupOrder.map(g => `
+    <div class="topic-group">
+      <div class="topic-group-label">${g}</div>
+      ${groups[g].map(({ t, i }) =>
+        `<button class="topic-chip ${activeTopicIdx === i ? 'active' : ''}" onclick="selectTopic(${i})">${t.name}</button>`
+      ).join('')}
+    </div>
+  `).join('');
 }
 
 function selectTopic(idx) {
