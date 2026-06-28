@@ -12,6 +12,8 @@ Storage: localStorage only (saved videos, saved tools, LLM settings, theme prefe
 
 GitHub Actions deploys automatically on push to `main`. The workflow (`.github/workflows/pages.yml`) uploads the repo root and deploys to GitHub Pages. Do not manually sync a `gh-pages` branch — just push to `main`.
 
+**Solo developer workflow:** Push directly to `main`. Do not open pull requests — they are not needed here.
+
 ## Design
 
 - Sectional chart aesthetic: tan/khaki background `#f0ead8`, blue `#004fa8` as primary accent, magenta `#b8005a` sparingly (logo only + pulse animation)
