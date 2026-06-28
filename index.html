@@ -615,6 +615,74 @@
   .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
   .btn-secondary:hover { background: var(--bg2); }
 
+  /* ── Library list view ──────────────────────────────────── */
+  .lib-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .lib-toolbar .filter-bar { margin-bottom: 0; }
+
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .view-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 9px;
+    font-size: 15px;
+    cursor: pointer;
+    color: var(--text3);
+    line-height: 1;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .view-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .view-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  /* List view overrides */
+  #library-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  #library-grid.list-view .card {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+  }
+  #library-grid.list-view .card:hover { transform: none; }
+  #library-grid.list-view .card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+  #library-grid.list-view .card-main {
+    flex: 1;
+    min-width: 0;
+  }
+  #library-grid.list-view .card-title { font-size: 14px; }
+  #library-grid.list-view .card-subtitle { font-size: 12px; }
+  #library-grid.list-view .card-body { display: none; }
+  #library-grid.list-view .card-btn {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-top: 0;
+    white-space: nowrap;
+  }
+  @media (max-width: 520px) {
+    #library-grid.list-view .card { flex-wrap: wrap; }
+    #library-grid.list-view .card-left { min-width: unset; flex-direction: row; align-items: center; }
+  }
+
   /* ── Section headings ───────────────────────────────────── */
   .section-heading {
     font-size: 22px;
@@ -679,10 +747,16 @@
   <section id="tab-library" class="tab-panel">
     <h1 class="section-heading">Resource Library</h1>
     <p class="section-sub">Essential FAA documents and recommended books for your PPL journey.</p>
-    <div class="filter-bar" id="lib-filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="faa">FAA Official</button>
-      <button class="filter-btn" data-filter="book">Books</button>
+    <div class="lib-toolbar">
+      <div class="filter-bar" id="lib-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="faa">FAA Official</button>
+        <button class="filter-btn" data-filter="book">Books</button>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-card" title="Card view">⊞</button>
+        <button class="view-btn" id="view-list" title="List view">☰</button>
+      </div>
     </div>
     <div class="cards-grid" id="library-grid"></div>
   </section>
@@ -1120,6 +1194,7 @@ const LLM_MODELS = {
 
 let currentTab = 'library';
 let libFilter = 'all';
+let libView = 'card'; // 'card' | 'list'
 let vidFilter = 'all';
 let activeTopicIdx = null;
 let savedVideos = [];
@@ -1181,24 +1256,47 @@ function renderLibrary() {
   const all = [...FAA_DOCS, ...BOOKS];
   const filtered = libFilter === 'all' ? all : all.filter(r => r.type === libFilter);
 
-  grid.innerHTML = filtered.map(r => {
-    const isFAA = r.type === 'faa';
-    return `
-      <div class="card" id="card-${r.id}" data-type="${r.type}">
-        <div>
-          <span class="card-tag ${isFAA ? '' : 'outline'}">${r.tag}</span>
-          <span class="card-code" style="margin-left:8px">${r.code}</span>
+  grid.classList.toggle('list-view', libView === 'list');
+
+  if (libView === 'list') {
+    grid.innerHTML = filtered.map(r => {
+      const isFAA = r.type === 'faa';
+      return `
+        <div class="card" id="card-${r.id}" data-type="${r.type}">
+          <div class="card-left">
+            <span class="card-tag ${isFAA ? '' : 'outline'}">${r.tag}</span>
+            <span class="card-code">${r.code}</span>
+          </div>
+          <div class="card-main">
+            <div class="card-title">${r.shortName}</div>
+            <div class="card-subtitle">${r.fullTitle}</div>
+          </div>
+          <a class="card-btn blue" href="${r.url}" target="_blank" rel="noopener">
+            ${isFAA ? '📄 PDF' : '🛒 Buy'} ↗
+          </a>
         </div>
-        <div class="card-title">${r.shortName}</div>
-        <div class="card-subtitle">${r.fullTitle}</div>
-        <div class="card-body"><strong>What it is:</strong> ${r.what}</div>
-        <div class="card-body"><strong>When to read it:</strong> ${r.when}</div>
-        <a class="card-btn blue" href="${r.url}" target="_blank" rel="noopener">
-          ${isFAA ? '📄 Free PDF' : '🛒 Amazon'} ↗
-        </a>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  } else {
+    grid.innerHTML = filtered.map(r => {
+      const isFAA = r.type === 'faa';
+      return `
+        <div class="card" id="card-${r.id}" data-type="${r.type}">
+          <div>
+            <span class="card-tag ${isFAA ? '' : 'outline'}">${r.tag}</span>
+            <span class="card-code" style="margin-left:8px">${r.code}</span>
+          </div>
+          <div class="card-title">${r.shortName}</div>
+          <div class="card-subtitle">${r.fullTitle}</div>
+          <div class="card-body"><strong>What it is:</strong> ${r.what}</div>
+          <div class="card-body"><strong>When to read it:</strong> ${r.when}</div>
+          <a class="card-btn blue" href="${r.url}" target="_blank" rel="noopener">
+            ${isFAA ? '📄 Free PDF' : '🛒 Amazon'} ↗
+          </a>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1568,6 +1666,20 @@ function init() {
     backdrop.addEventListener('click', e => {
       if (e.target === backdrop) backdrop.classList.remove('open');
     });
+  });
+
+  // Library view toggle
+  document.getElementById('view-card').addEventListener('click', () => {
+    libView = 'card';
+    document.getElementById('view-card').classList.add('active');
+    document.getElementById('view-list').classList.remove('active');
+    renderLibrary();
+  });
+  document.getElementById('view-list').addEventListener('click', () => {
+    libView = 'list';
+    document.getElementById('view-list').classList.add('active');
+    document.getElementById('view-card').classList.remove('active');
+    renderLibrary();
   });
 
   // Library filters
