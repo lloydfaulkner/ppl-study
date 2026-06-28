@@ -495,13 +495,24 @@
   .rec-item:hover { border-color: var(--blue); background: var(--bg3); border-left: 3px solid var(--blue); }
 
   .rec-source {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 90px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .rec-source-name {
     font-size: 12px;
     font-weight: 700;
     color: var(--blue);
     white-space: nowrap;
-    width: 90px;
-    flex-shrink: 0;
-    padding-top: 1px;
+  }
+  .rec-source-tag {
+    font-size: 10px;
+    font-style: italic;
+    color: var(--text3);
+    line-height: 1.2;
   }
   .rec-detail {
     flex: 1;
@@ -1887,6 +1898,14 @@ const SOURCE_TO_CARD = {
   'Say Again': 'say-again', 'Fate Is Hunter': 'fate-hunter', 'Weather Flying': 'weather-flying',
 };
 
+// Source label → short tagline (mirrors library card .tag field)
+const SOURCE_TO_TAG = {
+  'PHAK': 'Ground School Bible', 'AFH': 'How to Actually Fly', 'AIM': 'How ATC Works',
+  'FAR': 'The Rules', 'ACS': 'Checkride Blueprint', 'Wx Handbook': 'Weather Theory',
+  'Stick & Rudder': 'The Feel of Flying', 'Killing Zone': 'Safety & Judgment',
+  'Say Again': 'Radio Calls', 'Fate Is Hunter': 'Inspiration', 'Weather Flying': 'Advanced Weather',
+};
+
 // LLM model lists
 const LLM_MODELS = {
   anthropic: ['claude-opus-4-8', 'claude-sonnet-4-6', 'claude-haiku-4-5-20251001'],
@@ -2358,9 +2377,13 @@ function renderAdvisorPanel() {
       ? `Open ${r.source} ${r.detail} (new tab)`
       : `Jump to ${r.source} in Library`;
     const arrow = isExternal ? '↗' : '→';
+    const srcTag = SOURCE_TO_TAG[r.source] || '';
     return `
       <div class="rec-item" ${action} title="${tooltip}">
-        <div class="rec-source">${r.source}</div>
+        <div class="rec-source">
+          <span class="rec-source-name">${r.source}</span>
+          ${srcTag ? `<span class="rec-source-tag">${srcTag}</span>` : ''}
+        </div>
         <div class="rec-detail">
           <strong>${r.detail}</strong>
           <span>${r.note}</span>
