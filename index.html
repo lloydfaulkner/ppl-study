@@ -203,7 +203,7 @@
     color: #fff;
     align-self: flex-start;
   }
-  .card-tag.magenta { background: var(--magenta); }
+  .card-tag.outline { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
 
   .card-code {
     font-size: 11px;
@@ -1177,7 +1177,7 @@ function renderLibrary() {
     return `
       <div class="card" id="card-${r.id}" data-type="${r.type}">
         <div>
-          <span class="card-tag ${isFAA ? '' : 'magenta'}">${r.tag}</span>
+          <span class="card-tag ${isFAA ? '' : 'outline'}">${r.tag}</span>
           <span class="card-code" style="margin-left:8px">${r.code}</span>
         </div>
         <div class="card-title">${r.shortName}</div>
@@ -1185,7 +1185,7 @@ function renderLibrary() {
         <div class="card-body"><strong>What it is:</strong> ${r.what}</div>
         <div class="card-body"><strong>When to read it:</strong> ${r.when}</div>
         <div class="card-meta"><strong>Chapters:</strong> ${r.chapters}</div>
-        <a class="card-btn ${isFAA ? 'blue' : 'magenta'}" href="${r.url}" target="_blank" rel="noopener">
+        <a class="card-btn blue" href="${r.url}" target="_blank" rel="noopener">
           ${isFAA ? '📄 Free PDF' : '🛒 Amazon'} ↗
         </a>
       </div>
